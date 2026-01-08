@@ -1,0 +1,119 @@
+---
+title: Configuration .env
+description: Guide de configuration des variables d'environnement pour XetaSuite.
+---
+
+import { Aside, Tabs, TabItem } from '@astrojs/starlight/components';
+
+## Variables Backend (Laravel)
+
+### Application
+
+```env
+APP_NAME=XetaSuite
+APP_ENV=local          # local, staging, production
+APP_KEY=               # Généré avec php artisan key:generate
+APP_DEBUG=true         # false en production
+APP_URL=https://xetasuite.test
+```
+
+### Base de données
+
+```env
+DB_CONNECTION=pgsql
+DB_HOST=127.0.0.1
+DB_PORT=5432
+DB_DATABASE=xetasuite
+DB_USERNAME=postgres
+DB_PASSWORD=secret
+```
+
+<Aside type="caution">
+  XetaSuite supporte **uniquement PostgreSQL** (versions 16, 17, 18). MySQL/MariaDB ne sont pas supportés.
+</Aside>
+
+### Authentification Sanctum
+
+```env
+# Domaines autorisés pour l'authentification SPA
+SANCTUM_STATEFUL_DOMAINS=localhost:5173,xetasuite.test
+
+# Domaine du cookie de session
+SESSION_DOMAIN=.xetasuite.test
+
+# Driver de session
+SESSION_DRIVER=database
+```
+
+### CORS
+
+```env
+# URL du frontend (pour les headers CORS)
+FRONTEND_URL=http://localhost:5173
+```
+
+### Queue & Cache
+
+```env
+QUEUE_CONNECTION=redis    # sync, database, redis
+CACHE_DRIVER=redis        # file, database, redis
+REDIS_HOST=127.0.0.1
+REDIS_PASSWORD=null
+REDIS_PORT=6379
+```
+
+### Mail
+
+```env
+MAIL_MAILER=smtp
+MAIL_HOST=mailpit
+MAIL_PORT=1025
+MAIL_USERNAME=null
+MAIL_PASSWORD=null
+MAIL_ENCRYPTION=null
+MAIL_FROM_ADDRESS="noreply@xetasuite.com"
+MAIL_FROM_NAME="${APP_NAME}"
+```
+
+## Variables Frontend (React)
+
+### API
+
+```env
+# Vide pour utiliser le proxy Vite (développement)
+VITE_API_URL=
+
+# URL directe en production
+VITE_API_URL=https://api.xetasuite.com
+```
+
+## Configuration Production
+
+<Tabs>
+  <TabItem label="Backend">
+    ```env
+    APP_ENV=production
+    APP_DEBUG=false
+
+    # Domaines de production
+    SANCTUM_STATEFUL_DOMAINS=app.xetasuite.com
+    SESSION_DOMAIN=.xetasuite.com
+    FRONTEND_URL=https://app.xetasuite.com
+
+    # Redis pour les queues
+    QUEUE_CONNECTION=redis
+    CACHE_DRIVER=redis
+    SESSION_DRIVER=redis
+    ```
+  </TabItem>
+  <TabItem label="Frontend">
+    ```env
+    VITE_API_URL=https://api.xetasuite.com
+    ```
+  </TabItem>
+</Tabs>
+
+## Prochaines étapes
+
+- [Lancer en local](/XetaSuite-Site/getting-started/local/) - Démarrer l'environnement de développement
+- [Déploiement Production](/XetaSuite-Site/deployment/production/) - Mettre en production

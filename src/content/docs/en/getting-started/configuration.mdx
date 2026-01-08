@@ -1,0 +1,128 @@
+---
+title: .env Configuration
+description: Environment variable configuration guide for XetaSuite.
+---
+
+import { Aside, Tabs, TabItem } from '@astrojs/starlight/components';
+
+## Backend variables (Laravel)
+
+### Application
+
+```bash
+APP_NAME=XetaSuite
+APP_ENV=local  # local, staging, production
+APP_KEY=       # Generated with php artisan key:generate
+APP_DEBUG=true # false in production
+APP_URL=https://api.xetasuite.test # Backend URL
+```
+
+### Database
+
+```bash
+DB_CONNECTION=pgsql
+DB_HOST=127.0.0.1
+DB_PORT=5432
+DB_DATABASE=xetasuite
+DB_USERNAME=postgres
+DB_PASSWORD=secret
+```
+
+<Aside type="caution">
+  XetaSuite supports **PostgreSQL only** (version 18+). MySQL/MariaDB are not supported.
+</Aside>
+
+### Sanctum authentication
+
+```bash
+# Allowed domains for SPA authentication
+SANCTUM_STATEFUL_DOMAINS=xetasuite.test
+
+# Session cookie domain
+SESSION_DOMAIN=.xetasuite.test
+
+# Session driver
+SESSION_DRIVER=database
+
+# Secure cookies
+SESSION_SAME_SITE=none
+SESSION_SECURE_COOKIE=true
+```
+
+### CORS
+
+```bash
+# Frontend URL (for CORS headers)
+SPA_URL=http://xetasuite.test
+```
+
+### Queue & Cache
+
+```bash
+QUEUE_CONNECTION=redis    # sync, database, redis
+CACHE_DRIVER=redis        # file, database, redis
+REDIS_HOST=127.0.0.1
+REDIS_PASSWORD=null
+REDIS_PORT=6379
+```
+
+### Mail
+
+```bash
+MAIL_MAILER=smtp
+MAIL_HOST=mailpit
+MAIL_PORT=1025
+MAIL_USERNAME=null
+MAIL_PASSWORD=null
+MAIL_ENCRYPTION=null
+MAIL_FROM_ADDRESS="noreply@xetasuite.com"
+MAIL_FROM_NAME="${APP_NAME}"
+```
+
+## Frontend variables (React)
+
+### API
+
+```bash
+# Empty to use Vite proxy (development)
+VITE_API_URL=
+
+# Direct URL in production
+VITE_API_URL=https://api.xetasuite.com
+```
+
+## Production configuration
+
+<Tabs>
+  <TabItem label="Backend">
+    ```bash
+    APP_ENV=production
+    APP_DEBUG=false
+
+    # Production domains
+    SANCTUM_STATEFUL_DOMAINS=xetasuite.com
+    SESSION_DOMAIN=.xetasuite.com
+    FRONTEND_URL=https://xetasuite.com
+
+    # Recommended drivers
+    QUEUE_CONNECTION=redis
+    CACHE_DRIVER=redis
+    SESSION_DRIVER=database
+    ```
+  </TabItem>
+  <TabItem label="Frontend">
+    ```bash
+    VITE_API_URL=https://api.xetasuite.com
+    ```
+  </TabItem>
+</Tabs>
+
+## Important notes
+
+<Aside type="tip">
+  The `SESSION_DOMAIN` must start with a dot (`.xetasuite.com`) to allow cookie sharing between subdomains.
+</Aside>
+
+<Aside type="caution">
+  Never commit your `.env` file to version control. Use `.env.example` as a template.
+</Aside>

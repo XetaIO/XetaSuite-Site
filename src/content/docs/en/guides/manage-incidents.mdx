@@ -1,0 +1,171 @@
+---
+title: Manage incidents
+description: Guide for reporting and managing equipment incidents.
+---
+
+import { Steps, Aside } from '@astrojs/starlight/components';
+
+Incidents allow you to report and track equipment issues.
+
+## Priorities
+
+| Priority | Description |
+|----------|-------------|
+| `LOW` | Low impact, can wait |
+| `MEDIUM` | Moderate impact, handle quickly |
+| `HIGH` | Significant impact, urgent |
+| `CRITICAL` | Blocking, immediate intervention |
+
+## Statuses
+
+| Status | Description |
+|--------|-------------|
+| `OPEN` | Reported, not being handled |
+| `IN_PROGRESS` | Being resolved |
+| `RESOLVED` | Resolved |
+| `CLOSED` | Closed after validation |
+
+## Report an incident
+
+<Steps>
+
+1. **Access the Incidents module**
+
+   From the sidebar, click **Incidents**.
+
+2. **Click "New incident"**
+
+3. **Fill in the form**
+
+   | Field | Required | Description |
+   |-------|----------|-------------|
+   | Equipment | ✅ | Affected equipment |
+   | Title | ✅ | Short description |
+   | Priority | ✅ | Low, Medium, High, Critical |
+   | Description | ✅ | Problem details |
+
+4. **Save**
+
+   The incident is created with `OPEN` status.
+
+</Steps>
+
+## Lifecycle
+
+```
+OPEN → IN_PROGRESS → RESOLVED → CLOSED
+          ↓             ↓
+        OPEN ←────────┘
+```
+
+<Aside type="note">
+  An incident can be reopened (`OPEN`) from `IN_PROGRESS` or `RESOLVED` if the problem persists.
+</Aside>
+
+## API - Report an incident
+
+### Endpoint
+
+```http
+POST /api/v1/incidents
+```
+
+### Payload
+
+```json
+{
+    "material_id": 1,
+    "title": "Abnormal noise on compressor",
+    "priority": "HIGH",
+    "description": "The compressor has been making a clacking noise since this morning. Degraded operation."
+}
+```
+
+### Response
+
+```json
+{
+    "data": {
+        "id": 1,
+        "material": {
+            "id": 1,
+            "name": "Compressor A1"
+        },
+        "title": "Abnormal noise on compressor",
+        "priority": "HIGH",
+        "status": "OPEN",
+        "description": "The compressor has been making...",
+        "reported_by": {
+            "id": 5,
+            "full_name": "John Doe"
+        },
+        "created_at": "2024-01-15T08:30:00Z"
+    }
+}
+```
+
+## Update incident status
+
+### Start handling
+
+```http
+PATCH /api/v1/incidents/{id}
+```
+
+```json
+{
+    "status": "IN_PROGRESS",
+    "assigned_to": 3
+}
+```
+
+### Resolve
+
+```json
+{
+    "status": "RESOLVED",
+    "resolution": "Replaced worn bearing. Noise eliminated."
+}
+```
+
+### Close
+
+```json
+{
+    "status": "CLOSED"
+}
+```
+
+## Link to a maintenance
+
+An incident can trigger a maintenance:
+
+```http
+POST /api/v1/maintenances
+```
+
+```json
+{
+    "material_id": 1,
+    "type": "CORRECTIVE",
+    "incident_id": 1,
+    "scheduled_at": "2024-01-15T14:00:00Z",
+    "description": "Repair following incident #1"
+}
+```
+
+## Required permissions
+
+| Action | Permission |
+|--------|------------|
+| View list | `incident.viewAny` |
+| View an incident | `incident.view` |
+| Create | `incident.create` |
+| Modify | `incident.update` |
+| Delete | `incident.delete` |
+
+## Filters
+
+```http
+GET /api/v1/incidents?status=OPEN&priority=HIGH&material_id=1
+```

@@ -1,0 +1,134 @@
+---
+title: Authentication
+description: Understanding the Sanctum SPA authentication system in XetaSuite.
+---
+
+import { Aside, Steps } from '@astrojs/starlight/components';
+
+XetaSuite uses **Laravel Sanctum** in **stateful** mode (cookies) for SPA authentication. No API tokens are stored client-side.
+
+## Authentication Flow
+
+```batch
+sequenceDiagram
+    participant SPA as React SPA
+    participant Laravel as Laravel Backend
+
+    SPA->>Laravel: GET /sanctum/csrf-cookie
+    Laravel-->>SPA: Set XSRF-TOKEN cookie
+    SPA->>Laravel: POST /api/v1/auth/login (+ credentials)
+    Laravel-->>SPA: Set session cookie
+    SPA->>Laravel: GET /api/v1/user (with cookies)
+    Laravel-->>SPA: User data + permissions
+```
+
+## Backend Configuration
+
+### Sanctum (`config/sanctum.php`)
+
+```php
+'stateful' => explode(',', env('SANCTUM_STATEFUL_DOMAINS',
+    'localhost,localhost:5173,127.0.0.1,xetasuite.test'
+)),
+```
+
+### CORS (`config/cors.php`)
+
+```php
+'paths' => ['api/*', 'sanctum/csrf-cookie'],
+'allowed_origins' => [env('FRONTEND_URL', 'http://localhost:5173')],
+'supports_credentials' => true,
+```
+
+## Frontend Configuration
+
+### HTTP Client (Axios)
+
+```typescript
+const httpClient = axios.create({
+    baseURL: import.meta.env.VITE_API_URL || '',
+    headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+        'X-Requested-With': 'XMLHttpRequest',
+    },
+    withCredentials: true,   // ⚠️ Required for Sanctum
+    withXSRFToken: true,     // Auto-include X-XSRF-TOKEN header
+});
+```
+
+<Aside type="caution">
+  `withCredentials: true` is **mandatory** for cookies to be sent with each request.
+</Aside>
+
+## Login Implementation
+
+<Steps>
+
+1. **Get CSRF cookie**
+
+   ```typescript
+   await axios.get('/sanctum/csrf-cookie');
+   ```
+
+2. **Send credentials**
+
+   ```typescript
+   await httpClient.post('/api/v1/auth/login', {
+       email: 'admin@xetasuite.test',
+       password: 'password',
+       remember: true
+   });
+   ```
+
+3. **Fetch user**
+
+   ```typescript
+   const { data } = await httpClient.get('/api/v1/user');
+   // data contains: user, roles[], permissions[]
+   ```
+
+</Steps>
+
+## Permission Checking
+
+```typescript
+// In React components
+const {
+    hasPermission,
+    hasRole,
+    hasAnyPermission,
+    hasAnyRole,
+    isOnHeadquarters
+} = useAuth();
+
+// Check a permission
+if (hasPermission('company.create')) {
+    // Show create button
+}
+
+// Check a role
+if (hasRole('admin')) {
+    // Show admin panel
+}
+
+// Check any of the permissions
+if (hasAnyPermission(['company.update', 'company.delete'])) {
+    // Show menu
+}
+
+// Check any of the roles
+if (hasRole(['admin', 'manager'])) {
+    // Show user edit button
+}
+
+// Check if current user is on headquarters site
+if (isOnHeadquarters()) {
+    // User is on headquarters site
+}
+```
+
+## Next Steps
+
+- [Roles & Permissions](/XetaSuite-Site/en/concepts/roles-permissions/) - Permission system
+- [Multi-Sites](/XetaSuite-Site/en/concepts/multi-sites/) - Per-site permissions

@@ -1,0 +1,135 @@
+---
+title: Cron & Scheduler
+description: Laravel scheduler configuration for scheduled tasks.
+---
+
+import { Tabs, TabItem, Aside } from '@astrojs/starlight/components';
+
+Laravel Scheduler allows you to define scheduled tasks in code rather than in the crontab.
+
+## Cron configuration
+
+Add a single cron entry to run the Laravel scheduler:
+
+```bash
+* * * * * cd /var/www/xetasuite-core && php artisan schedule:run >> /dev/null 2>&1
+```
+
+<Tabs>
+  <TabItem label="Linux">
+    ```bash
+    crontab -e
+    ```
+    Add the line above.
+  </TabItem>
+  <TabItem label="Laravel Forge">
+    1. Go to **Servers** → your server
+    2. Click on **Scheduler**
+    3. Check **Enable Scheduler** for the site
+  </TabItem>
+</Tabs>
+
+## XetaSuite scheduled tasks
+
+Tasks are defined in `routes/console.php`:
+
+```php
+use Illuminate\Support\Facades\Schedule;
+
+// Clean expired sessions
+Schedule::command('session:gc')->daily();
+
+// Prune old failed jobs
+Schedule::command('queue:prune-failed --hours=48')->daily();
+
+// Daily backup
+Schedule::command('backup:run')->dailyAt('02:00');
+
+// Clean old backups
+Schedule::command('backup:clean')->dailyAt('03:00');
+```
+
+## Useful commands
+
+### View scheduled tasks
+
+```bash
+php artisan schedule:list
+```
+
+### Manually run the scheduler
+
+```bash
+php artisan schedule:run
+```
+
+### Run a specific command
+
+```bash
+php artisan backup:run
+```
+
+## Backups
+
+<Aside type="note">
+  XetaSuite uses `spatie/laravel-backup` for automatic backups.
+</Aside>
+
+### Configuration
+
+Edit `config/backup.php`:
+
+```php
+'backup' => [
+    'name' => env('APP_NAME', 'xetasuite'),
+    'source' => [
+        'files' => [
+            'include' => [base_path()],
+            'exclude' => [
+                base_path('vendor'),
+                base_path('node_modules'),
+            ],
+        ],
+        'databases' => ['pgsql'],
+    ],
+    'destination' => [
+        'disks' => ['s3'],  // or 'local'
+    ],
+],
+```
+
+### Available commands
+
+```bash
+# Run backup
+php artisan backup:run
+
+# Run backup (database only)
+php artisan backup:run --only-db
+
+# List backups
+php artisan backup:list
+
+# Clean old backups
+php artisan backup:clean
+```
+
+## Monitoring
+
+### Check scheduler is running
+
+```bash
+php artisan schedule:list
+```
+
+### View logs
+
+```bash
+tail -f storage/logs/laravel.log
+```
+
+### Failed jobs
+
+```bash
+php artisan queue:failed
+```

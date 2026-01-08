@@ -1,0 +1,169 @@
+---
+title: Mouvements de pièces
+description: Guide pour gérer les entrées et sorties de stock dans XetaSuite.
+---
+
+import { Steps, Aside } from '@astrojs/starlight/components';
+
+Les **ItemMovements** permettent de tracer toutes les entrées et sorties de stock.
+
+## Types de mouvements
+
+| Type | Description | Impact stock |
+|------|-------------|--------------|
+| `ENTRY` | Réception de marchandise | +quantité |
+| `EXIT` | Sortie/utilisation | -quantité |
+| `ADJUSTMENT` | Correction d'inventaire | ±quantité |
+| `TRANSFER` | Transfert entre sites | 0 (équilibré) |
+
+## Créer un mouvement d'entrée
+
+<Steps>
+
+1. **Accéder au module Inventaire**
+
+   Depuis le menu latéral, cliquez sur **Inventaire** puis **Mouvements**.
+
+2. **Cliquer sur "Nouveau mouvement"**
+
+3. **Sélectionner "Entrée"**
+
+4. **Remplir le formulaire**
+
+   | Champ | Obligatoire | Description |
+   |-------|-------------|-------------|
+   | Pièce | ✅ | Pièce concernée |
+   | Quantité | ✅ | Nombre d'unités |
+   | Fournisseur | ❌ | Company source |
+   | Référence | ❌ | N° de commande/BL |
+   | Notes | ❌ | Commentaires |
+
+5. **Valider**
+
+   Le stock est automatiquement mis à jour.
+
+</Steps>
+
+## Créer un mouvement de sortie
+
+<Steps>
+
+1. **Sélectionner "Sortie"**
+
+2. **Choisir la pièce**
+
+3. **Indiquer la quantité**
+
+   <Aside type="caution">
+     La quantité ne peut pas dépasser le stock disponible.
+   </Aside>
+
+4. **Optionnel : Lier à une maintenance**
+
+   Associez la sortie à une intervention en cours.
+
+5. **Valider**
+
+</Steps>
+
+## API - Créer un mouvement
+
+### Endpoint
+
+```http
+POST /api/v1/item-movements
+```
+
+### Payload - Entrée
+
+```json
+{
+    "item_id": 1,
+    "type": "ENTRY",
+    "quantity": 50,
+    "company_id": 3,
+    "reference": "CMD-2024-0042",
+    "notes": "Réception commande annuelle"
+}
+```
+
+### Payload - Sortie
+
+```json
+{
+    "item_id": 1,
+    "type": "EXIT",
+    "quantity": 5,
+    "maintenance_id": 12,
+    "notes": "Utilisé pour maintenance préventive"
+}
+```
+
+### Réponse
+
+```json
+{
+    "data": {
+        "id": 1,
+        "item": {
+            "id": 1,
+            "name": "Filtre à huile",
+            "reference": "FH-001",
+            "quantity": 55
+        },
+        "type": "ENTRY",
+        "quantity": 50,
+        "company_name": "ACME Corp",
+        "created_by": {
+            "id": 5,
+            "full_name": "Jean Dupont"
+        },
+        "created_at": "2024-01-15T10:30:00Z"
+    }
+}
+```
+
+## Ajustement d'inventaire
+
+Pour corriger une erreur de stock :
+
+```json
+{
+    "item_id": 1,
+    "type": "ADJUSTMENT",
+    "quantity": -3,
+    "notes": "Correction suite inventaire physique"
+}
+```
+
+<Aside type="note">
+  Les ajustements peuvent être positifs ou négatifs.
+</Aside>
+
+## Historique des mouvements
+
+Consultez l'historique complet d'une pièce :
+
+```http
+GET /api/v1/items/{id}/movements
+```
+
+## Préservation des données
+
+Lorsqu'une Company ou un User est supprimé :
+- Le **nom** est préservé dans `company_name` / `created_by_name`
+- L'historique des mouvements reste intact
+
+## Permissions requises
+
+| Action | Permission |
+|--------|------------|
+| Voir les mouvements | `item-movement.viewAny` |
+| Créer un mouvement | `item-movement.create` |
+| Modifier | `item-movement.update` |
+| Supprimer | `item-movement.delete` |
+
+## Prochaines étapes
+
+- [Créer une entreprise](/XetaSuite-Site/guides/create-company/) - Gérer les entreprises
+- [API Endpoints](/XetaSuite-Site/api/endpoints/) - Référence API complète

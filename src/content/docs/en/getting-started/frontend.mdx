@@ -1,0 +1,80 @@
+---
+title: Frontend Installation
+description: React frontend installation guide for XetaSuite ERP.
+---
+
+import { Steps, Tabs, TabItem, Aside } from '@astrojs/starlight/components';
+
+This guide walks you through the installation of the XetaSuite React frontend.
+
+## Prerequisites
+
+- **Node.js** 20+ (LTS recommended)
+- **npm** 10+ or **pnpm** 9+
+- XetaSuite backend installed and running
+
+## Installation
+
+<Steps>
+
+1. **Clone the repository**
+
+   ```bash
+   git clone https://github.com/xetaio/XetaSuite-React.git
+   cd XetaSuite-React
+   ```
+
+2. **Install dependencies**
+
+   <Tabs>
+     <TabItem label="npm">
+       ```bash
+       npm install
+       ```
+     </TabItem>
+     <TabItem label="pnpm">
+       ```bash
+       pnpm install
+       ```
+     </TabItem>
+   </Tabs>
+
+3. **Configure environment**
+
+   ```bash
+   cp .env.example .env
+   ```
+
+   Edit `.env` if needed:
+
+   ```bash
+   # Empty to use Vite proxy (development)
+   VITE_API_URL=
+
+   # Or direct backend URL (production)
+   VITE_API_URL=https://api.xetasuite.com
+   ```
+
+4. **Start development server**
+
+   <Tabs>
+     <TabItem label="npm">
+       ```bash
+       npm run dev
+       ```
+     </TabItem>
+     <TabItem label="pnpm">
+       ```bash
+       pnpm dev
+       ```
+     </TabItem>
+   </Tabs>
+
+   The app will be available at `http://localhost:5173`
+
+</Steps>
+
+## Next Steps
+
+- [Configuration](/XetaSuite-Site/en/getting-started/configuration/) - Environment variables
+- [Authentication](/XetaSuite-Site/en/concepts/authentication/) - Understanding the Sanctum flow

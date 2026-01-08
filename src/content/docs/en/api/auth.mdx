@@ -1,0 +1,190 @@
+---
+title: Auth API
+description: XetaSuite authentication API documentation.
+---
+
+import { Aside } from '@astrojs/starlight/components';
+
+XetaSuite uses **Laravel Sanctum** in stateful mode (cookies) for SPA authentication.
+
+## Authentication endpoints
+
+### Get CSRF cookie
+
+<Aside type="caution">
+  This endpoint must be called **before** login and logout.
+</Aside>
+
+```http
+GET /sanctum/csrf-cookie
+```
+
+**Response:** `XSRF-TOKEN` cookie set
+
+---
+
+### Login
+
+```http
+POST /api/v1/auth/login
+```
+
+**Headers:**
+```
+Content-Type: application/json
+Accept: application/json
+X-XSRF-TOKEN: {token from cookie}
+```
+
+**Body:**
+```json
+{
+    "email": "user@example.com",
+    "password": "password",
+    "remember": true
+}
+```
+
+**Response 200:**
+```json
+{
+    "two_factor": false
+}
+```
+
+**Response 422 (Validation):**
+```json
+{
+    "message": "The provided credentials are incorrect.",
+    "errors": {
+        "email": ["The provided credentials are incorrect."]
+    }
+}
+```
+
+---
+
+### Two-Factor Challenge
+
+If `two_factor: true` in the login response:
+
+```http
+POST /api/v1/auth/two-factor-challenge
+```
+
+**Body:**
+```json
+{
+    "code": "123456"
+}
+```
+
+Or with a recovery code:
+```json
+{
+    "recovery_code": "abcd-efgh-ijkl"
+}
+```
+
+---
+
+### Logout
+
+```http
+POST /api/v1/auth/logout
+```
+
+**Response 204:** No Content
+
+---
+
+### Get current user
+
+```http
+GET /api/v1/user
+```
+
+**Response:**
+```json
+{
+    "data": {
+        "id": 1,
+        "first_name": "John",
+        "last_name": "Doe",
+        "full_name": "John Doe",
+        "email": "john@example.com",
+        "username": "jdoe",
+        "locale": "en",
+        "current_site_id": 1,
+        "roles": ["admin"],
+        "permissions": ["company.viewAny", "company.view", "..."],
+        "sites": [
+            {
+                "id": 1,
+                "name": "Headquarters",
+                "is_headquarters": true
+            }
+        ]
+    }
+}
+```
+
+---
+
+### Switch current site
+
+```http
+PATCH /api/v1/user/site
+```
+
+**Body:**
+```json
+{
+    "site_id": 2
+}
+```
+
+**Response:** Updated user with new permissions for the selected site.
+
+---
+
+### Update locale
+
+```http
+PATCH /api/v1/user/locale
+```
+
+**Body:**
+```json
+{
+    "locale": "fr"
+}
+```
+
+## React client implementation
+
+```typescript
+// httpClient.ts
+const httpClient = axios.create({
+    baseURL: import.meta.env.VITE_API_URL || '',
+    headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+        'X-Requested-With': 'XMLHttpRequest',
+    },
+    withCredentials: true,   // Required for Sanctum cookies
+    withXSRFToken: true,     // Auto-include XSRF-TOKEN header
+});
+
+// AuthRepository.ts
+export const AuthRepository = {
+    login: async (credentials: LoginCredentials): Promise<void> => {
+        await httpClient.get('/sanctum/csrf-cookie');
+        await httpClient.post('/api/v1/auth/login', credentials);
+    },
+    logout: async (): Promise<void> => {
+        await httpClient.get('/sanctum/csrf-cookie');
+        await httpClient.post('/api/v1/auth/logout');
+    },
+};
+```

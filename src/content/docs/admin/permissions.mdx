@@ -1,0 +1,158 @@
+---
+title: Gestion des permissions
+description: Guide sur le système de permissions granulaires de XetaSuite.
+---
+
+import { Aside } from '@astrojs/starlight/components';
+
+## Format des permissions
+
+```
+{resource}.{action}
+```
+
+### Actions standards
+
+| Action | Description |
+|--------|-------------|
+| `viewAny` | Voir la liste des ressources |
+| `view` | Voir une ressource spécifique |
+| `create` | Créer une nouvelle ressource |
+| `update` | Modifier une ressource |
+| `delete` | Supprimer une ressource |
+
+## Liste complète des permissions
+
+### Gestion des sites
+
+| Permission | Description |
+|------------|-------------|
+| `site.viewAny` | Voir la liste des sites |
+| `site.view` | Voir un site |
+| `site.create` | Créer un site |
+| `site.update` | Modifier un site |
+| `site.delete` | Supprimer un site |
+
+### Gestion des zones
+
+| Permission | Description |
+|------------|-------------|
+| `zone.viewAny` | Voir la liste des zones |
+| `zone.view` | Voir une zone |
+| `zone.create` | Créer une zone |
+| `zone.update` | Modifier une zone |
+| `zone.delete` | Supprimer une zone |
+
+### Gestion des matériels
+
+| Permission | Description |
+|------------|-------------|
+| `material.viewAny` | Voir la liste des matériels |
+| `material.view` | Voir un matériel |
+| `material.create` | Créer un matériel |
+| `material.update` | Modifier un matériel |
+| `material.delete` | Supprimer un matériel |
+
+### Gestion des maintenances
+
+| Permission | Description |
+|------------|-------------|
+| `maintenance.viewAny` | Voir la liste des maintenances |
+| `maintenance.view` | Voir une maintenance |
+| `maintenance.create` | Créer une maintenance |
+| `maintenance.update` | Modifier une maintenance |
+| `maintenance.delete` | Supprimer une maintenance |
+
+### Gestion des incidents
+
+| Permission | Description |
+|------------|-------------|
+| `incident.viewAny` | Voir la liste des incidents |
+| `incident.view` | Voir un incident |
+| `incident.create` | Signaler un incident |
+| `incident.update` | Modifier un incident |
+| `incident.delete` | Supprimer un incident |
+
+### Gestion des nettoyages
+
+| Permission | Description |
+|------------|-------------|
+| `cleaning.viewAny` | Voir la liste des nettoyages |
+| `cleaning.view` | Voir un nettoyage |
+| `cleaning.create` | Créer un nettoyage |
+| `cleaning.update` | Modifier un nettoyage |
+| `cleaning.delete` | Supprimer un nettoyage |
+
+### Gestion de l'inventaire
+
+| Permission | Description |
+|------------|-------------|
+| `item.viewAny` | Voir la liste des pièces |
+| `item.view` | Voir une pièce |
+| `item.create` | Créer une pièce |
+| `item.update` | Modifier une pièce |
+| `item.delete` | Supprimer une pièce |
+| `item-movement.viewAny` | Voir les mouvements |
+| `item-movement.create` | Créer un mouvement |
+
+### Gestion des fournisseurs (HQ)
+
+<Aside type="note">
+  Ces permissions ne sont effectives que sur le Site Siège.
+</Aside>
+
+| Permission | Description |
+|------------|-------------|
+| `company.viewAny` | Voir la liste des fournisseurs |
+| `company.view` | Voir un fournisseur |
+| `company.create` | Créer un fournisseur |
+| `company.update` | Modifier un fournisseur |
+| `company.delete` | Supprimer un fournisseur |
+
+### Administration
+
+| Permission | Description |
+|------------|-------------|
+| `user.viewAny` | Voir la liste des utilisateurs |
+| `user.view` | Voir un utilisateur |
+| `user.create` | Créer un utilisateur |
+| `user.update` | Modifier un utilisateur |
+| `user.delete` | Supprimer un utilisateur |
+| `role.viewAny` | Voir les rôles |
+| `role.create` | Créer un rôle |
+| `role.update` | Modifier un rôle |
+| `role.delete` | Supprimer un rôle |
+
+## Vérification côté client
+
+```tsx
+const { hasPermission, hasAnyPermission } = useAuth();
+
+// Permission unique
+if (hasPermission('material.create')) {
+    // Afficher bouton création
+}
+
+// Une des permissions (OR)
+if (hasAnyPermission(['material.update', 'material.delete'])) {
+    // Afficher menu actions
+}
+```
+
+## Vérification côté serveur
+
+```php
+// Dans un Controller
+$this->authorize('create', Material::class);
+
+// Via Gate
+Gate::authorize('update', $material);
+
+// Directement sur l'utilisateur
+$user->can('material.delete');
+```
+
+## Prochaines étapes
+
+- [Gestion des rôles](/XetaSuite-Site/admin/roles/) - Assigner des permissions aux rôles
+- [Multi-Sites](/XetaSuite-Site/concepts/multi-sites/) - Permissions par site

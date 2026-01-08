@@ -1,0 +1,136 @@
+---
+title: Installation Frontend
+description: Guide d'installation du frontend React pour XetaSuite ERP.
+---
+
+import { Steps, Tabs, TabItem, Aside } from '@astrojs/starlight/components';
+
+Ce guide vous accompagne dans l'installation du frontend React de XetaSuite.
+
+## Prérequis
+
+- **Node.js** 20+ (LTS recommandé)
+- **npm** 10+ ou **pnpm** 9+
+- Backend XetaSuite installé et fonctionnel
+
+## Installation
+
+<Steps>
+
+1. **Cloner le repository**
+
+   ```bash
+   git clone https://github.com/xetaio/XetaSuite-React.git
+   cd XetaSuite-React
+   ```
+
+2. **Installer les dépendances**
+
+   <Tabs>
+     <TabItem label="npm">
+       ```bash
+       npm install
+       ```
+     </TabItem>
+     <TabItem label="pnpm">
+       ```bash
+       pnpm install
+       ```
+     </TabItem>
+   </Tabs>
+
+3. **Configurer l'environnement**
+
+   ```bash
+   cp .env.example .env
+   ```
+
+   Éditez `.env` si nécessaire :
+
+   ```env
+   # Vide pour utiliser le proxy Vite (développement)
+   VITE_API_URL=
+
+   # Ou URL directe du backend (production)
+   VITE_API_URL=https://api.xetasuite.com
+   ```
+
+4. **Lancer le serveur de développement**
+
+   <Tabs>
+     <TabItem label="npm">
+       ```bash
+       npm run dev
+       ```
+     </TabItem>
+     <TabItem label="pnpm">
+       ```bash
+       pnpm dev
+       ```
+     </TabItem>
+   </Tabs>
+
+   L'application sera disponible sur `http://localhost:5173`
+
+</Steps>
+
+## Configuration du Proxy Vite
+
+Le proxy Vite redirige les requêtes `/api` et `/sanctum` vers le backend Laravel :
+
+```typescript
+// vite.config.ts
+server: {
+  proxy: {
+    '/sanctum': {
+      target: 'https://xetasuite.test',
+      changeOrigin: true,
+      secure: false,
+    },
+    '/api': {
+      target: 'https://xetasuite.test',
+      changeOrigin: true,
+      secure: false,
+    }
+  },
+}
+```
+
+<Aside type="caution">
+  Assurez-vous que le backend est accessible sur le domaine configuré dans le proxy.
+</Aside>
+
+## Stack Technique
+
+| Package | Version | Usage |
+|---------|---------|-------|
+| React | 19.x | Bibliothèque UI |
+| TypeScript | 5.9+ | Typage statique |
+| Vite | 7.x | Build tool |
+| Tailwind CSS | 4.x | Styling |
+| React Router | 7.x | Routing |
+| Axios | 1.x | HTTP Client |
+| i18next | 25.x | Internationalisation |
+
+## Structure du projet
+
+```
+src/
+├── app/              # Point d'entrée application
+│   ├── routes/       # Configuration des routes
+│   └── i18n/         # Traductions
+├── features/         # Modules fonctionnels
+│   ├── Auth/         # Authentification
+│   ├── Sites/        # Gestion des sites
+│   ├── Materials/    # Gestion du matériel
+│   └── ...
+└── shared/           # Code partagé
+    ├── api/          # Client HTTP
+    ├── components/   # Composants UI
+    └── types/        # Types TypeScript
+```
+
+## Prochaines étapes
+
+- [Configuration .env](/XetaSuite-Site/getting-started/configuration/) - Variables d'environnement
+- [Authentification](/XetaSuite-Site/concepts/authentication/) - Comprendre le flow Sanctum

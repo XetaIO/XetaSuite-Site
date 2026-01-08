@@ -1,0 +1,150 @@
+---
+title: Rôles & Permissions
+description: Système de gestion des rôles et permissions avec Spatie Laravel-Permission.
+---
+
+import { Aside } from '@astrojs/starlight/components';
+
+XetaSuite utilise [Spatie Laravel-Permission](https://spatie.be/docs/laravel-permission) avec le mode **teams** activé pour gérer les permissions par site.
+
+## Architecture
+
+```
+User ─┬─ Site 1 ─── Role: Admin ─── Permissions: [company.*, user.*, ...]
+      │
+      ├─ Site 2 ─── Role: Manager ─── Permissions: [material.*, zone.*, ...]
+      │
+      └─ Site 3 ─── Role: User ─── Permissions: [material.view, zone.view]
+```
+
+<Aside type="note">
+  Les rôles et permissions sont **scopés par site**. Un utilisateur peut avoir des rôles différents sur chaque site.
+</Aside>
+
+## Configuration
+
+### `config/permission.php`
+
+```php
+'teams' => true,
+'team_foreign_key' => 'site_id',
+```
+
+## Assigner un rôle
+
+```php
+// ⚠️ TOUJOURS définir le contexte du site AVANT l'assignation
+setPermissionsTeamId($site->id);
+
+// Assigner le rôle
+$user->assignRole('manager');
+
+// Le rôle est enregistré avec site_id dans la table pivot
+```
+
+## Vérifier les permissions
+
+### Dans les Policies
+
+```php
+class CompanyPolicy
+{
+    public function view(User $user, Company $company): bool
+    {
+        // Vérifie la permission pour le site actuel
+        return $user->can('company.view');
+    }
+}
+```
+
+### Dans les Controllers
+
+```php
+public function index(Request $request)
+{
+    // Via Gate
+    $this->authorize('viewAny', Company::class);
+
+    // Ou directement
+    if ($request->user()->can('company.viewAny')) {
+        // ...
+    }
+}
+```
+
+### Dans React
+
+```tsx
+const { hasPermission, hasRole, hasAnyPermission } = useAuth();
+
+// Permission unique
+{hasPermission('company.create') && <CreateButton />}
+
+// Plusieurs permissions (OR)
+{hasAnyPermission(['company.update', 'company.delete']) && <EditMenu />}
+
+// Rôle
+{hasRole('admin') && <AdminPanel />}
+```
+
+## Permissions disponibles
+
+### Format standard
+
+```
+{resource}.{action}
+```
+
+| Action | Description |
+|--------|-------------|
+| `viewAny` | Voir la liste |
+| `view` | Voir un élément |
+| `create` | Créer |
+| `update` | Modifier |
+| `delete` | Supprimer |
+
+### Exemples
+
+- `company.viewAny`, `company.view`, `company.create`, `company.update`, `company.delete`
+- `material.viewAny`, `material.view`, `material.create`, `material.update`, `material.delete`
+- `user.viewAny`, `user.view`, `user.create`, `user.update`, `user.delete`
+
+## Middleware Chain
+
+L'ordre des middlewares est critique :
+
+```
+SetCurrentSite → SetCurrentPermissionsAndRoles → Controller
+```
+
+1. **SetCurrentSite** - Charge le site actuel depuis `user.current_site_id`
+2. **SetCurrentPermissionsAndRoles** - Appelle `setPermissionsTeamId($siteId)`
+3. **Controller** - Les permissions sont maintenant scopées au bon site
+
+## Création de rôles
+
+```php
+use Spatie\Permission\Models\Role;
+
+// Créer un rôle scopé au site
+setPermissionsTeamId($site->id);
+
+$role = Role::create([
+    'name' => 'manager',
+    'guard_name' => 'web',
+]);
+
+// Assigner des permissions
+$role->givePermissionTo([
+    'material.viewAny',
+    'material.view',
+    'material.create',
+    'zone.viewAny',
+    'zone.view',
+]);
+```
+
+## Prochaines étapes
+
+- [Multi-Sites](/XetaSuite-Site/concepts/multi-sites/) - Gestion multi-tenant
+- [Gestion Utilisateurs](/XetaSuite-Site/admin/users/) - Administration des utilisateurs

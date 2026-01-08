@@ -1,0 +1,145 @@
+---
+title: Run locally
+description: Guide for starting XetaSuite in local development environment.
+---
+
+import { Steps, Tabs, TabItem, Aside } from '@astrojs/starlight/components';
+
+## Prerequisites
+
+Make sure you have completed:
+- [Backend Installation](/XetaSuite-Site/en/getting-started/backend/)
+- [Frontend Installation](/XetaSuite-Site/en/getting-started/frontend/)
+- [.env Configuration](/XetaSuite-Site/en/getting-started/configuration/)
+
+## Quick start
+
+### With Laravel Herd (Recommended)
+
+If you use [Laravel Herd](https://herd.laravel.com/), the backend is automatically available at `https://xetasuite-core.test`.
+
+<Steps>
+
+1. **Start backend services**
+
+   ```bash
+   cd XetaSuite-core
+   composer run dev
+   ```
+
+   This command launches:
+   - The Laravel server
+   - The queue worker
+
+2. **Start the frontend**
+
+   ```bash
+   cd XetaSuite-React
+   npm run dev
+   ```
+
+3. **Access the application**
+
+   Open `http://localhost:5173` in your browser.
+
+</Steps>
+
+### Without Herd
+
+<Tabs>
+  <TabItem label="Terminal 1 - Backend">
+    ```bash
+    cd XetaSuite-core
+    php artisan serve
+    ```
+  </TabItem>
+  <TabItem label="Terminal 2 - Queue">
+    ```bash
+    cd XetaSuite-core
+    php artisan queue:work
+    ```
+  </TabItem>
+  <TabItem label="Terminal 3 - Frontend">
+    ```bash
+    cd XetaSuite-React
+    npm run dev
+    ```
+  </TabItem>
+</Tabs>
+
+## Demo account
+
+After running the seeders, you can log in with:
+
+| Email | Password | Role |
+|-------|----------|------|
+| `admin@xetasuite.test` | `password` | HQ Admin |
+| `manager@xetasuite.test` | `password` | Site 1 Manager |
+| `user@xetasuite.test` | `password` | Site 1 User |
+
+<Aside type="tip">
+  In demo mode (`APP_DEMO=true`), credentials are pre-filled on the login page.
+</Aside>
+
+## Useful commands
+
+### Backend
+
+```bash
+# Run tests
+php artisan test
+
+# Run a specific test
+php artisan test --filter=CompanyController
+
+# Refresh the database
+php artisan migrate:fresh --seed
+
+# Format code
+vendor/bin/pint --dirty
+```
+
+### Frontend
+
+```bash
+# Development server
+npm run dev
+
+# Production build
+npm run build
+
+# Run linter
+npm run lint
+```
+
+## Troubleshooting
+
+### CORS errors
+
+Check that `SPA_URL` in `.env` matches your frontend URL:
+
+```bash
+SPA_URL=http://localhost:5173
+```
+
+### 419 CSRF token mismatch
+
+Make sure you're calling `/sanctum/csrf-cookie` before login:
+
+```typescript
+await axios.get('/sanctum/csrf-cookie');
+await axios.post('/api/v1/auth/login', credentials);
+```
+
+### Session not persisting
+
+Check these settings:
+
+```txt
+SANCTUM_STATEFUL_DOMAINS=localhost:5173,xetasuite.test
+SESSION_DOMAIN=localhost
+```
+
+<Aside type="note">
+  For local development with different ports, include all domains in `SANCTUM_STATEFUL_DOMAINS`.
+</Aside>

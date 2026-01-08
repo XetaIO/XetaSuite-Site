@@ -1,0 +1,128 @@
+---
+title: XetaSuite ERP
+description: Solution ERP multi-sites moderne pour la gestion de maintenance, incidents et inventaire.
+template: splash
+hero:
+  tagline: |
+    La solution ERP nouvelle génération pour gérer vos sites, équipements et équipes.
+    Multi-sites • Temps réel • Open Source
+  image:
+    file: ../../assets/logo-dark.svg
+  actions:
+    - text: Démarrer →
+      link: /XetaSuite-Site/getting-started/backend/
+      icon: right-arrow
+      variant: primary
+    - text: Voir la démo
+      link: https://demo.xetasuite.com
+      icon: external
+      variant: minimal
+---
+
+import { Card, CardGrid, LinkCard, Aside } from '@astrojs/starlight/components';
+import videoSrc from '../../assets/xetasuite-presentation.mp4';
+
+<div class="video-container">
+  <video controls playsinline preload="metadata" poster="">
+    <source src={videoSrc} type="video/mp4" />
+    Votre navigateur ne supporte pas la lecture vidéo.
+  </video>
+</div>
+
+<div class="stats-grid">
+  <div class="stat-item">
+    <span class="stat-number">∞</span>
+    <span class="stat-label">Sites gérés</span>
+  </div>
+  <div class="stat-item">
+    <span class="stat-number">100%</span>
+    <span class="stat-label">Open Source</span>
+  </div>
+  <div class="stat-item">
+    <span class="stat-number">7+</span>
+    <span class="stat-label">Modules intégrés</span>
+  </div>
+  <div class="stat-item">
+    <span class="stat-number">i18n</span>
+    <span class="stat-label">Multilingue natif</span>
+  </div>
+</div>
+
+## ✨ Pourquoi XetaSuite ?
+
+<CardGrid stagger>
+  <Card title="Multi-Sites & Zones" icon="rocket">
+    Gérez plusieurs sites avec des zones imbriquées. Chaque site dispose de ses propres rôles, permissions et données isolées.
+  </Card>
+  <Card title="Gestion du Matériel" icon="setting">
+    Suivez l'état de vos équipements en temps réel, planifiez les maintenances préventives et gérez les incidents efficacement.
+  </Card>
+  <Card title="Inventaire Intelligent" icon="document">
+    Stock de pièces détachées avec traçabilité complète des mouvements, alertes de seuil et liaison fournisseurs.
+  </Card>
+  <Card title="Permissions Granulaires" icon="approve-check">
+    Système de rôles et permissions scopé par site. Contrôle fin des accès pour chaque membre de l'équipe.
+  </Card>
+</CardGrid>
+
+## 🛠️ Stack Technique Moderne
+
+<div class="tech-grid">
+  <div class="tech-item">
+    <strong>Backend</strong>
+    <span>Laravel 12 + PHP 8.4</span>
+  </div>
+  <div class="tech-item">
+    <strong>Frontend</strong>
+    <span>React 19 + TypeScript</span>
+  </div>
+  <div class="tech-item">
+    <strong>Auth</strong>
+    <span>Laravel Sanctum</span>
+  </div>
+  <div class="tech-item">
+    <strong>Database</strong>
+    <span>PostgreSQL 17</span>
+  </div>
+  <div class="tech-item">
+    <strong>Permissions</strong>
+    <span>Spatie Permission</span>
+  </div>
+  <div class="tech-item">
+    <strong>Testing</strong>
+    <span>Pest PHP</span>
+  </div>
+</div>
+
+## 📖 Commencez maintenant
+
+<CardGrid>
+  <LinkCard
+    title="Installation Backend"
+    description="Configurez le serveur Laravel avec PostgreSQL en quelques minutes."
+    href="/XetaSuite-Site/getting-started/backend/"
+  />
+  <LinkCard
+    title="Installation Frontend"
+    description="Lancez l'interface React avec Vite et connectez-vous à l'API."
+    href="/XetaSuite-Site/getting-started/frontend/"
+  />
+  <LinkCard
+    title="Authentification"
+    description="Maîtrisez le flow d'authentification Sanctum SPA (cookies)."
+    href="/XetaSuite-Site/concepts/authentication/"
+  />
+  <LinkCard
+    title="Architecture Multi-Sites"
+    description="Comprenez le fonctionnement multi-tenant avec permissions par site."
+    href="/XetaSuite-Site/concepts/multi-sites/"
+  />
+</CardGrid>
+
+<div class="demo-banner">
+  <h3>🚀 Prêt à essayer ?</h3>
+  <p>Explorez XetaSuite avec des données de démonstration. Aucune inscription requise.</p>
+  <a href="https://demo.xetasuite.com" class="demo-button">
+    Accéder à la démo gratuite →
+  </a>
+</div>

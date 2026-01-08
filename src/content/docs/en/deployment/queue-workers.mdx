@@ -1,0 +1,164 @@
+---
+title: Queue Workers
+description: Queue worker configuration for XetaSuite.
+---
+
+import { Tabs, TabItem, Aside } from '@astrojs/starlight/components';
+
+XetaSuite uses Laravel queues for asynchronous tasks: sending emails, generating reports, etc.
+
+## Configuration
+
+### Recommended driver: Redis
+
+```bash
+QUEUE_CONNECTION=redis
+REDIS_HOST=127.0.0.1
+REDIS_PORT=6379
+```
+
+### Alternative: Database
+
+```bash
+QUEUE_CONNECTION=database
+```
+
+Create the jobs table:
+```bash
+php artisan queue:table
+php artisan migrate
+```
+
+## Start a worker
+
+### Development
+
+```bash
+php artisan queue:work
+```
+
+### Production
+
+Use a process manager to keep workers running.
+
+<Tabs>
+  <TabItem label="Supervisor">
+    Create `/etc/supervisor/conf.d/xetasuite-worker.conf`:
+
+    ```ini
+    [program:xetasuite-worker]
+    process_name=%(program_name)s_%(process_num)02d
+    command=php /var/www/xetasuite-core/artisan queue:work redis --sleep=3 --tries=3 --max-time=3600
+    autostart=true
+    autorestart=true
+    stopasgroup=true
+    killasgroup=true
+    user=www-data
+    numprocs=2
+    redirect_stderr=true
+    stdout_logfile=/var/www/xetasuite-core/storage/logs/worker.log
+    stopwaitsecs=3600
+    ```
+
+    Enable:
+    ```bash
+    sudo supervisorctl reread
+    sudo supervisorctl update
+    sudo supervisorctl start xetasuite-worker:*
+    ```
+  </TabItem>
+  <TabItem label="Systemd">
+    Create `/etc/systemd/system/xetasuite-worker.service`:
+
+    ```ini
+    [Unit]
+    Description=XetaSuite Queue Worker
+    After=network.target
+
+    [Service]
+    User=www-data
+    Group=www-data
+    Restart=always
+    ExecStart=/usr/bin/php /var/www/xetasuite-core/artisan queue:work redis --sleep=3 --tries=3 --max-time=3600
+    StandardOutput=append:/var/www/xetasuite-core/storage/logs/worker.log
+    StandardError=append:/var/www/xetasuite-core/storage/logs/worker-error.log
+
+    [Install]
+    WantedBy=multi-user.target
+    ```
+
+    Enable:
+    ```bash
+    sudo systemctl enable xetasuite-worker
+    sudo systemctl start xetasuite-worker
+    ```
+  </TabItem>
+  <TabItem label="Laravel Forge">
+    1. Go to **Servers** → your server
+    2. Click **Queue** in the menu
+    3. Configure:
+       - **Connection**: `redis`
+       - **Queue**: `default`
+       - **Processes**: `2`
+    4. Click **Create Worker**
+  </TabItem>
+</Tabs>
+
+## Useful commands
+
+### Monitor workers
+
+```bash
+php artisan queue:monitor redis:default
+```
+
+### View failed jobs
+
+```bash
+php artisan queue:failed
+```
+
+### Retry failed jobs
+
+```bash
+# Retry all
+php artisan queue:retry all
+
+# Retry specific
+php artisan queue:retry 5
+```
+
+### Clear failed jobs
+
+```bash
+php artisan queue:flush
+```
+
+## Restart after deployment
+
+<Aside type="caution">
+  Workers must be restarted after code deployment to load new changes.
+</Aside>
+
+```bash
+php artisan queue:restart
+```
+
+This command signals workers to gracefully restart after finishing their current job.
+
+## Horizon (Optional)
+
+For more advanced queue management, consider using [Laravel Horizon](https://laravel.com/docs/horizon):
+
+```bash
+composer require laravel/horizon
+php artisan horizon:install
+php artisan migrate
+```
+
+Run Horizon:
+```bash
+php artisan horizon
+```
+
+Access the dashboard at `/horizon`.

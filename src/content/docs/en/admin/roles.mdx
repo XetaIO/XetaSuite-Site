@@ -1,0 +1,107 @@
+---
+title: Role Management
+description: Guide for creating and managing roles in XetaSuite.
+---
+
+import { Aside } from '@astrojs/starlight/components';
+
+Roles are **scoped by site** thanks to Spatie Laravel-Permission with teams mode.
+
+## Default roles
+
+| Role | Description |
+|------|-------------|
+| `admin` | Full access to the site |
+| `manager` | Operations management |
+| `technician` | Technical interventions |
+| `user` | Read-only access |
+
+## Create a role
+
+### Via the interface
+
+1. Go to **Administration** → **Roles**
+2. Click **New role**
+3. Name the role and select permissions
+4. Save
+
+### Via the API
+
+```http
+POST /api/v1/roles
+```
+
+```json
+{
+    "name": "supervisor",
+    "permissions": [
+        "material.viewAny",
+        "material.view",
+        "maintenance.viewAny",
+        "maintenance.view",
+        "maintenance.update",
+        "incident.viewAny",
+        "incident.view",
+        "incident.update"
+    ]
+}
+```
+
+<Aside type="caution">
+  Roles are created in the context of the current site. Switch sites to create a role on another site.
+</Aside>
+
+## Modify a role
+
+```http
+PATCH /api/v1/roles/{id}
+```
+
+```json
+{
+    "name": "supervisor",
+    "permissions": [
+        "material.viewAny",
+        "material.view",
+        "material.update",
+        "maintenance.*"
+    ]
+}
+```
+
+## Permissions by module
+
+### Materials
+- `material.viewAny`, `material.view`, `material.create`, `material.update`, `material.delete`
+
+### Zones
+- `zone.viewAny`, `zone.view`, `zone.create`, `zone.update`, `zone.delete`
+
+### Maintenances
+- `maintenance.viewAny`, `maintenance.view`, `maintenance.create`, `maintenance.update`, `maintenance.delete`
+
+### Incidents
+- `incident.viewAny`, `incident.view`, `incident.create`, `incident.update`, `incident.delete`
+
+### Cleanings
+- `cleaning.viewAny`, `cleaning.view`, `cleaning.create`, `cleaning.update`, `cleaning.delete`
+
+### Inventory
+- `item.viewAny`, `item.view`, `item.create`, `item.update`, `item.delete`
+- `item-movement.viewAny`, `item-movement.view`, `item-movement.create`, `item-movement.update`, `item-movement.delete`
+
+### Suppliers (HQ only)
+- `company.viewAny`, `company.view`, `company.create`, `company.update`, `company.delete`
+
+### Users
+- `user.viewAny`, `user.view`, `user.create`, `user.update`, `user.delete`
+
+## Delete a role
+
+```http
+DELETE /api/v1/roles/{id}
+```
+
+<Aside type="caution">
+  A role with assigned users cannot be deleted. Reassign users first.
+</Aside>

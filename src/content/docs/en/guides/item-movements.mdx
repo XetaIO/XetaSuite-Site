@@ -1,0 +1,144 @@
+---
+title: Item movements
+description: Guide for managing stock entries and exits in XetaSuite.
+---
+
+import { Steps, Aside } from '@astrojs/starlight/components';
+
+**ItemMovements** allow you to track all stock entries and exits.
+
+## Movement types
+
+| Type | Description | Stock impact |
+|------|-------------|--------------|
+| `ENTRY` | Goods reception | +quantity |
+| `EXIT` | Output/usage | -quantity |
+
+## Create an Entry/Exit movement
+
+<Steps>
+
+1. **Access the Items module**
+
+   From the sidebar, click **Items**.
+
+2. **Click "Add Entry/Exit" on the item**
+
+3. **Fill in the form**
+
+   | Field | Required | Description |
+   |-------|----------|-------------|
+   | Quantity | ✅ | Number of units |
+   | Unit Price | ❌ | Unit price |
+   | Supplier | ❌ | Source company |
+   | Invoice number | ❌ | Order number |
+   | Invoice date | ❌ | Order date |
+   | Date | ❌ | Date when Entry/Exit occurred |
+   | Notes | ❌ | Comments |
+
+4. **Validate**
+
+   Stock is automatically updated.
+
+</Steps>
+
+## API - Create a movement
+
+### Endpoint
+
+```http
+POST /api/v1/item-movements
+```
+
+### Payload - Entry
+
+```json
+{
+    "item_id": 1,
+    "type": "ENTRY",
+    "quantity": 50,
+    "company_id": 3,
+    "reference": "PO-2024-0042",
+    "notes": "Annual order reception"
+}
+```
+
+### Payload - Exit
+
+```json
+{
+    "item_id": 1,
+    "type": "EXIT",
+    "quantity": 5,
+    "maintenance_id": 12,
+    "notes": "Used for preventive maintenance"
+}
+```
+
+### Payload - Adjustment
+
+```json
+{
+    "item_id": 1,
+    "type": "ADJUSTMENT",
+    "quantity": -3,
+    "notes": "Stock correction after inventory count"
+}
+```
+
+## Stock calculation
+
+The item's `quantity` is automatically recalculated:
+
+```
+current_stock = Σ entries - Σ exits + Σ adjustments
+```
+
+## Number warning minimum alerts
+
+When stock falls below the number_warning_minimum, an alert notification is triggered:
+
+```json
+{
+    "item_id": 1,
+    "name": "Air Filter XL",
+    "quantity": 2,
+    "number_warning_minimum": 5,
+    "number_warning_enabled": true
+}
+```
+
+## Number critical minimum alerts
+
+When stock falls below the number_critical_minimum, an alert email is triggered and an alert notification:
+
+```json
+{
+    "item_id": 1,
+    "name": "Air Filter XL",
+    "quantity": 2,
+    "number_critical_minimum": 5,
+    "number_critical_enabled": true
+}
+```
+
+## Required permissions
+
+| Action | Permission |
+|--------|------------|
+| View list | `item-movement.viewAny` |
+| View a movement | `item-movement.view` |
+| Create | `item-movement.create` |
+| Modify | `item-movement.update` |
+| Delete | `item-movement.delete` |
+
+## Movement history
+
+All movements are logged with:
+- Creation date
+- User who created the movement
+- Previous and new quantity
+
+```http
+GET /api/v1/items/{id}/movements
+```

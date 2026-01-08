@@ -1,0 +1,173 @@
+---
+title: Main Endpoints
+description: XetaSuite API endpoint reference.
+---
+
+import { Aside } from '@astrojs/starlight/components';
+
+All endpoints are prefixed with `/api/v1`.
+
+## Response format
+
+### Single resource
+
+```json
+{
+    "data": {
+        "id": 1,
+        "name": "...",
+        "created_at": "2024-01-15T10:30:00Z",
+        "updated_at": "2024-01-15T10:30:00Z"
+    }
+}
+```
+
+### Paginated collection
+
+```json
+{
+    "data": [...],
+    "meta": {
+        "current_page": 1,
+        "from": 1,
+        "last_page": 5,
+        "per_page": 15,
+        "to": 15,
+        "total": 72
+    },
+    "links": {
+        "first": "...",
+        "last": "...",
+        "prev": null,
+        "next": "..."
+    }
+}
+```
+
+## Sites
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/sites` | List sites |
+| GET | `/sites/{id}` | Site details |
+| POST | `/sites` | Create a site |
+| PATCH | `/sites/{id}` | Update a site |
+| DELETE | `/sites/{id}` | Delete a site |
+
+## Zones
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/zones` | List zones |
+| GET | `/zones/{id}` | Zone details |
+| POST | `/zones` | Create a zone |
+| PATCH | `/zones/{id}` | Update a zone |
+| DELETE | `/zones/{id}` | Delete a zone |
+
+<Aside type="tip">
+  Use `?include=children` to get child zones.
+</Aside>
+
+## Materials
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/materials` | List materials |
+| GET | `/materials/{id}` | Material details |
+| POST | `/materials` | Create a material |
+| PATCH | `/materials/{id}` | Update a material |
+| DELETE | `/materials/{id}` | Delete a material |
+
+### Available filters
+
+```
+GET /materials?zone_id=5&status=active&search=compressor
+```
+
+## Maintenances
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/maintenances` | List maintenances |
+| GET | `/maintenances/{id}` | Maintenance details |
+| POST | `/maintenances` | Create a maintenance |
+| PATCH | `/maintenances/{id}` | Update a maintenance |
+| DELETE | `/maintenances/{id}` | Delete a maintenance |
+
+### Filters
+
+```
+GET /maintenances?material_id=5&status=scheduled&type=preventive
+```
+
+## Incidents
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/incidents` | List incidents |
+| GET | `/incidents/{id}` | Incident details |
+| POST | `/incidents` | Create an incident |
+| PATCH | `/incidents/{id}` | Update an incident |
+| DELETE | `/incidents/{id}` | Delete an incident |
+
+## Cleanings
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/cleanings` | List cleanings |
+| GET | `/cleanings/{id}` | Cleaning details |
+| POST | `/cleanings` | Create a cleaning |
+| PATCH | `/cleanings/{id}` | Update a cleaning |
+| DELETE | `/cleanings/{id}` | Delete a cleaning |
+
+## Items (Inventory)
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/items` | List items |
+| GET | `/items/{id}` | Item details |
+| POST | `/items` | Create an item |
+| PATCH | `/items/{id}` | Update an item |
+| DELETE | `/items/{id}` | Delete an item |
+
+## Item Movements
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/item-movements` | List movements |
+| GET | `/item-movements/{id}` | Movement details |
+| POST | `/item-movements` | Create a movement |
+
+## Companies (HQ only)
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/companies` | List suppliers |
+| GET | `/companies/{id}` | Supplier details |
+| POST | `/companies` | Create a supplier |
+| PATCH | `/companies/{id}` | Update a supplier |
+| DELETE | `/companies/{id}` | Delete a supplier |
+
+<Aside type="note">
+  Companies are only accessible from the Headquarters site.
+</Aside>
+
+## Users
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/users` | List users |
+| GET | `/users/{id}` | User details |
+| POST | `/users` | Create a user |
+| PATCH | `/users/{id}` | Update a user |
+| DELETE | `/users/{id}` | Delete a user |
+
+## Roles
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/roles` | List roles |
+| GET | `/roles/{id}` | Role details |
+| POST | `/roles` | Create a role |
+| PATCH | `/roles/{id}` | Update a role |
+| DELETE | `/roles/{id}` | Delete a role |

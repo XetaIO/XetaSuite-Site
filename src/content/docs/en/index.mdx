@@ -1,0 +1,131 @@
+---
+title: The next-generation ERP solution
+description: Modern multi-site ERP solution for maintenance, incidents and inventory management.
+template: splash
+hero:
+  tagline: |
+    Modern multi-site ERP solution to manage your sites, equipment and teams.
+    Multi-site • Real-time • Open Source
+  image:
+    alt: XetaSuite logo
+    dark: ../../../assets/logo-dark.svg
+    light: ../../../assets/logo.svg
+
+  actions:
+    - text: Get Started →
+      link: /XetaSuite-Site/en/getting-started/backend/
+      icon: right-arrow
+      variant: primary
+    - text: View Demo
+      link: https://xetasuite.xetaravel.com
+      icon: external
+      variant: minimal
+---
+
+import { Card, CardGrid, LinkCard, Aside } from '@astrojs/starlight/components';
+import videoSrc from '../../../assets/xetasuite-presentation.mp4';
+
+<div class="video-container">
+  <video controls playsinline preload="metadata" poster="">
+    <source src={videoSrc} type="video/mp4" />
+    Your browser does not support video playback.
+  </video>
+</div>
+
+<div class="stats-grid">
+  <div class="stat-item">
+    <span class="stat-number">∞</span>
+    <span class="stat-label">Sites managed</span>
+  </div>
+  <div class="stat-item">
+    <span class="stat-number">100%</span>
+    <span class="stat-label">Open Source</span>
+  </div>
+  <div class="stat-item">
+    <span class="stat-number">7+</span>
+    <span class="stat-label">Integrated modules</span>
+  </div>
+  <div class="stat-item">
+    <span class="stat-number">i18n</span>
+    <span class="stat-label">Native multilingual</span>
+  </div>
+</div>
+
+## ✨ Why XetaSuite?
+
+<CardGrid stagger>
+  <Card title="Multi-Sites & Zones" icon="rocket">
+    Manage multiple sites with nested zones. Each site has its own roles, permissions and isolated data.
+  </Card>
+  <Card title="Equipment Management" icon="setting">
+    Track your equipment status in real-time, schedule preventive maintenance and manage incidents efficiently.
+  </Card>
+  <Card title="Smart Inventory" icon="document">
+    Spare parts stock with complete movement traceability, threshold alerts and supplier linking.
+  </Card>
+  <Card title="Granular Permissions" icon="approve-check">
+    Role and permission system scoped by site. Fine-grained access control for each team member.
+  </Card>
+</CardGrid>
+
+## 🛠️ Modern Tech Stack
+
+<div class="tech-grid">
+  <div class="tech-item">
+    <strong>Backend</strong>
+    <span>Laravel 12 + PHP 8.4</span>
+  </div>
+  <div class="tech-item">
+    <strong>Frontend</strong>
+    <span>React 19 + TypeScript</span>
+  </div>
+  <div class="tech-item">
+    <strong>Auth</strong>
+    <span>Laravel Sanctum</span>
+  </div>
+  <div class="tech-item">
+    <strong>Database</strong>
+    <span>PostgreSQL 18</span>
+  </div>
+  <div class="tech-item">
+    <strong>Permissions</strong>
+    <span>Spatie Permission</span>
+  </div>
+  <div class="tech-item">
+    <strong>Testing</strong>
+    <span>Pest PHP</span>
+  </div>
+</div>
+
+## 📖 Start Now
+
+<CardGrid>
+  <LinkCard
+    title="Backend Installation"
+    description="Set up the Laravel server with PostgreSQL in minutes."
+    href="/XetaSuite-Site/en/getting-started/backend/"
+  />
+  <LinkCard
+    title="Frontend Installation"
+    description="Launch the React interface with Vite and connect to the API."
+    href="/XetaSuite-Site/en/getting-started/frontend/"
+  />
+  <LinkCard
+    title="Authentication"
+    description="Master the Sanctum SPA authentication flow (cookies)."
+    href="/XetaSuite-Site/en/concepts/authentication/"
+  />
+  <LinkCard
+    title="Multi-Site Architecture"
+    description="Understand multi-tenant functionality with per-site permissions."
+    href="/XetaSuite-Site/en/concepts/multi-sites/"
+  />
+</CardGrid>
+
+<div class="demo-banner">
+  <h3>🚀 Ready to try?</h3>
+  <p>Explore XetaSuite with demo data. No registration required.</p>
+  <a href="https://xetasuite.xetaravel.com" class="demo-button">
+    Access demo →
+  </a>
+</div>

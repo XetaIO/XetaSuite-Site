@@ -1,0 +1,174 @@
+---
+title: Multi-Sites & Zones
+description: Architecture multi-tenant avec gestion des sites et zones imbriquées.
+---
+
+import { Aside } from '@astrojs/starlight/components';
+
+XetaSuite est conçu pour gérer **plusieurs sites** (multi-tenant), chacun avec ses propres zones, matériels et permissions.
+
+## Hiérarchie des entités
+
+```
+Organisation
+└── Sites
+    ├── Siège (is_headquarters = true)
+    │   └── Gère les Companies globalement
+    │
+    └── Sites réguliers
+        └── Zones (imbriquées)
+            └── Matériels
+                ├── Maintenances
+                ├── Incidents
+                └── Nettoyages
+```
+
+## Site Siège (Headquarters)
+
+<Aside type="note">
+  Le **Site Siège** (`is_headquarters = true`) est un site spécial qui gère les ressources globales comme les Companies (fournisseurs).
+</Aside>
+
+### Ressources HQ-Only
+
+| Ressource | Description |
+|-----------|-------------|
+| Companies | Fournisseurs de pièces et/ou maintenanciers |
+
+### Protection dans les Policies
+
+```php
+class CompanyPolicy
+{
+    public function before(User $user, string $ability): ?bool
+    {
+        // Bloque l'accès si l'utilisateur n'est pas sur le siège
+        if (! isOnHeadquarters()) {
+            return false;
+        }
+        return null; // Continue vers la vérification de permission
+    }
+}
+```
+
+## Sites réguliers
+
+Chaque site possède :
+- Ses propres **zones** (arborescence imbriquée)
+- Ses propres **matériels**
+- Ses propres **rôles et permissions**
+- Son propre **inventaire** de pièces
+
+## Zones imbriquées
+
+Les zones utilisent une structure auto-référentielle :
+
+```php
+class Zone extends Model
+{
+    public function parent(): BelongsTo
+    {
+        return $this->belongsTo(Zone::class, 'parent_id');
+    }
+
+    public function children(): HasMany
+    {
+        return $this->hasMany(Zone::class, 'parent_id');
+    }
+}
+```
+
+### Exemple d'arborescence
+
+```
+Site Paris
+├── Bâtiment A
+│   ├── Étage 1
+│   │   ├── Salle serveur
+│   │   └── Open space
+│   └── Étage 2
+│       └── Direction
+└── Bâtiment B
+    └── Entrepôt
+```
+
+## Changement de site (Site Switching)
+
+L'utilisateur peut changer de site via le **SiteSwitcher** :
+
+```typescript
+// Frontend - SiteSwitcher.tsx
+const handleSiteChange = async (site: UserSite) => {
+    await switchSite(site.id);  // PATCH /api/v1/user/site
+    window.location.reload();   // Recharge les permissions
+};
+```
+
+```php
+// Backend - Met à jour current_site_id
+$user->update(['current_site_id' => $request->site_id]);
+```
+
+<Aside type="caution">
+  Un **rechargement de page** est nécessaire après le changement de site pour rafraîchir les permissions dans le contexte React.
+</Aside>
+
+## Middleware de site
+
+### SetCurrentSite
+
+```php
+class SetCurrentSite
+{
+    public function handle(Request $request, Closure $next)
+    {
+        $site = $request->user()?->currentSite;
+
+        if ($site) {
+            session(['is_on_headquarters' => $site->is_headquarters]);
+        }
+
+        return $next($request);
+    }
+}
+```
+
+### Helper global
+
+```php
+// app/helpers.php
+function isOnHeadquarters(): bool
+{
+    return session('is_on_headquarters', false);
+}
+```
+
+## Structure de données User
+
+```typescript
+interface User {
+    id: number;
+    current_site_id?: number;
+    roles: string[];        // Rôles du site actuel
+    permissions: string[];  // Permissions du site actuel
+    sites: UserSite[];      // Tous les sites accessibles
+}
+
+interface UserSite {
+    id: number;
+    name: string;
+    is_headquarters: boolean;
+}
+```
+
+## Bonnes pratiques
+
+1. **Toujours vérifier le site** avant les opérations sensibles
+2. **Utiliser les Policies** pour la logique d'autorisation HQ
+3. **Ne jamais hardcoder** les vérifications de site dans les controllers
+4. **Tester les deux contextes** (HQ et site régulier)
+
+## Prochaines étapes
+
+- [Gestion Utilisateurs](/XetaSuite-Site/admin/users/) - Créer et gérer les utilisateurs
+- [Gestion des Rôles](/XetaSuite-Site/admin/roles/) - Configurer les rôles par site

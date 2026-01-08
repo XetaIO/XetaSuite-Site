@@ -1,0 +1,142 @@
+---
+title: Lancer en local
+description: Guide pour démarrer XetaSuite en environnement de développement local.
+---
+
+import { Steps, Tabs, TabItem, Aside } from '@astrojs/starlight/components';
+
+## Prérequis
+
+Assurez-vous d'avoir complété :
+- [Installation Backend](/XetaSuite-Site/getting-started/backend/)
+- [Installation Frontend](/XetaSuite-Site/getting-started/frontend/)
+- [Configuration .env](/XetaSuite-Site/getting-started/configuration/)
+
+## Démarrage rapide
+
+### Avec Laravel Herd (Recommandé)
+
+Si vous utilisez [Laravel Herd](https://herd.laravel.com/), le backend est automatiquement accessible sur `https://xetasuite-core.test`.
+
+<Steps>
+
+1. **Démarrer les services backend**
+
+   ```bash
+   cd XetaSuite-core
+   composer run dev
+   ```
+
+   Cette commande lance :
+   - Le serveur Laravel
+   - Le worker de queue
+   - Vite pour les assets backend (si utilisés)
+
+2. **Démarrer le frontend**
+
+   ```bash
+   cd XetaSuite-React
+   npm run dev
+   ```
+
+3. **Accéder à l'application**
+
+   Ouvrez `http://localhost:5173` dans votre navigateur.
+
+</Steps>
+
+### Sans Herd
+
+<Tabs>
+  <TabItem label="Terminal 1 - Backend">
+    ```bash
+    cd XetaSuite-core
+    php artisan serve
+    ```
+  </TabItem>
+  <TabItem label="Terminal 2 - Queue">
+    ```bash
+    cd XetaSuite-core
+    php artisan queue:work
+    ```
+  </TabItem>
+  <TabItem label="Terminal 3 - Frontend">
+    ```bash
+    cd XetaSuite-React
+    npm run dev
+    ```
+  </TabItem>
+</Tabs>
+
+## Compte de démonstration
+
+Après avoir exécuté les seeders, vous pouvez vous connecter avec :
+
+| Email | Mot de passe | Rôle |
+|-------|--------------|------|
+| `admin@xetasuite.test` | `password` | Admin HQ |
+| `manager@site1.test` | `password` | Manager Site 1 |
+| `user@site1.test` | `password` | Utilisateur Site 1 |
+
+<Aside type="tip">
+  En mode démo (`APP_DEMO=true`), les identifiants sont pré-remplis sur la page de connexion.
+</Aside>
+
+## Commandes utiles
+
+### Backend
+
+```bash
+# Lancer les tests
+php artisan test
+
+# Lancer un test spécifique
+php artisan test --filter=CompanyController
+
+# Rafraîchir la base de données
+php artisan migrate:fresh --seed
+
+# Formater le code
+vendor/bin/pint --dirty
+
+# Voir les routes API
+php artisan route:list --path=api
+```
+
+### Frontend
+
+```bash
+# Build de production
+npm run build
+
+# Linter
+npm run lint
+
+# Preview du build
+npm run preview
+```
+
+## Résolution de problèmes
+
+### Erreur CORS
+
+Vérifiez que `SANCTUM_STATEFUL_DOMAINS` et `FRONTEND_URL` sont correctement configurés dans `.env` du backend.
+
+### Erreur 401 Unauthorized
+
+1. Assurez-vous que le cookie CSRF est obtenu avant la connexion
+2. Vérifiez que `withCredentials: true` est configuré dans Axios
+
+### Erreur Vite Manifest
+
+```bash
+cd XetaSuite-React
+npm run build
+# ou
+npm run dev
+```
+
+## Prochaines étapes
+
+- [Authentification](/XetaSuite-Site/concepts/authentication/) - Comprendre le flow d'auth
+- [Multi-Sites](/XetaSuite-Site/concepts/multi-sites/) - Gestion multi-tenant

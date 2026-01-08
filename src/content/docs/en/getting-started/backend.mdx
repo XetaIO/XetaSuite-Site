@@ -1,0 +1,82 @@
+---
+title: Backend Installation
+description: Backend Laravel installation guide for XetaSuite ERP.
+---
+
+import { Steps, Tabs, TabItem, Aside } from '@astrojs/starlight/components';
+
+This guide walks you through the installation of the XetaSuite Laravel backend.
+
+## Prerequisites
+
+- **PHP** 8.4+
+- **Composer** 2.x
+- **PostgreSQL** 18
+- **Redis** (optional, for queues)
+
+## Installation
+
+<Steps>
+
+1. **Clone the repository**
+
+   ```bash
+   git clone https://github.com/xetaio/XetaSuite-core.git
+   cd XetaSuite-core
+   ```
+
+2. **Install PHP dependencies**
+
+   ```bash
+   composer install
+   ```
+
+3. **Configure environment**
+
+   ```bash
+   cp .env.example .env
+   php artisan key:generate
+   ```
+
+4. **Configure database**
+
+   ```bash
+   DB_CONNECTION=pgsql
+   DB_HOST=127.0.0.1
+   DB_PORT=5432
+   DB_DATABASE=xetasuite
+   DB_USERNAME=your_user
+   DB_PASSWORD=your_password
+   ```
+
+5. **Run migrations**
+
+   ```bash
+   php artisan migrate --seed
+   ```
+
+6. **Start the server**
+
+   ```bash
+   php artisan serve
+   ```
+
+</Steps>
+
+## Sanctum Configuration
+
+<Aside type="tip">
+  XetaSuite uses **Sanctum stateful authentication** (cookies) for SPA authentication.
+</Aside>
+
+Configure allowed domains in `.env`:
+
+```bash
+SANCTUM_STATEFUL_DOMAINS=xetasuite.test
+SESSION_DOMAIN=.xetasuite.test
+```
+
+## Next Steps
+
+- [Frontend Installation](/XetaSuite-Site/en/getting-started/frontend/) - Configure the React app
+- [Configuration](/XetaSuite-Site/en/getting-started/configuration/) - Advanced configuration options

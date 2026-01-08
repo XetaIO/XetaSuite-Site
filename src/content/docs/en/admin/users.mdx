@@ -1,0 +1,126 @@
+---
+title: User Management
+description: Guide for managing users in XetaSuite.
+---
+
+import { Steps, Aside } from '@astrojs/starlight/components';
+
+## Create a user
+
+<Steps>
+
+1. **Access the Users module**
+
+   From the sidebar, click **Administration** → **Users**.
+
+2. **Click "New user"**
+
+3. **Fill in the information**
+
+   | Field | Required | Description |
+   |-------|----------|-------------|
+   | First name | ✅ | User's first name |
+   | Last name | ✅ | User's last name |
+   | Email | ✅ | Unique email (login) |
+   | Username | ✅ | Unique identifier |
+   | Password | ✅ | Min. 8 characters |
+   | Language | ✅ | fr or en |
+
+4. **Assign a site**
+
+   Select the user's initial site.
+
+5. **Assign a role**
+
+   Choose the role for this site.
+
+6. **Save**
+
+</Steps>
+
+## API - Create a user
+
+### Endpoint
+
+```http
+POST /api/v1/users
+```
+
+### Payload
+
+```json
+{
+    "first_name": "John",
+    "last_name": "Doe",
+    "email": "john.doe@example.com",
+    "username": "jdoe",
+    "password": "SecurePass123!",
+    "password_confirmation": "SecurePass123!",
+    "locale": "en",
+    "site_id": 1,
+    "role": "manager"
+}
+```
+
+## Assign additional sites
+
+A user can have access to multiple sites with different roles:
+
+```http
+POST /api/v1/users/{id}/sites
+```
+
+```json
+{
+    "site_id": 2,
+    "role": "user"
+}
+```
+
+<Aside type="note">
+  Each site can have a different role. The user switches sites via the SiteSwitcher.
+</Aside>
+
+## Modify permissions
+
+### Change role on a site
+
+```http
+PATCH /api/v1/users/{id}/sites/{site_id}
+```
+
+```json
+{
+    "role": "admin"
+}
+```
+
+### Remove access to a site
+
+```http
+DELETE /api/v1/users/{id}/sites/{site_id}
+```
+
+## Disable a user
+
+Users are never deleted, only disabled:
+
+```http
+PATCH /api/v1/users/{id}
+```
+
+```json
+{
+    "is_active": false
+}
+```
+
+## Required permissions
+
+| Action | Permission |
+|--------|------------|
+| View list | `user.viewAny` |
+| View a user | `user.view` |
+| Create | `user.create` |
+| Modify | `user.update` |
+| Delete | `user.delete` |

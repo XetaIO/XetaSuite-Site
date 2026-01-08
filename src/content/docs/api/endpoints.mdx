@@ -1,0 +1,205 @@
+---
+title: Endpoints principaux
+description: Référence des endpoints API de XetaSuite.
+---
+
+import { Aside } from '@astrojs/starlight/components';
+
+Tous les endpoints sont préfixés par `/api/v1`.
+
+## Format des réponses
+
+### Ressource unique
+
+```json
+{
+    "data": {
+        "id": 1,
+        "name": "...",
+        "created_at": "2024-01-15T10:30:00Z",
+        "updated_at": "2024-01-15T10:30:00Z"
+    }
+}
+```
+
+### Collection paginée
+
+```json
+{
+    "data": [...],
+    "meta": {
+        "current_page": 1,
+        "from": 1,
+        "last_page": 5,
+        "per_page": 15,
+        "to": 15,
+        "total": 72
+    },
+    "links": {
+        "first": "...",
+        "last": "...",
+        "prev": null,
+        "next": "..."
+    }
+}
+```
+
+## Sites
+
+| Méthode | Endpoint | Description |
+|---------|----------|-------------|
+| GET | `/sites` | Liste des sites |
+| GET | `/sites/{id}` | Détail d'un site |
+| POST | `/sites` | Créer un site |
+| PATCH | `/sites/{id}` | Modifier un site |
+| DELETE | `/sites/{id}` | Supprimer un site |
+
+## Zones
+
+| Méthode | Endpoint | Description |
+|---------|----------|-------------|
+| GET | `/zones` | Liste des zones |
+| GET | `/zones/{id}` | Détail d'une zone |
+| POST | `/zones` | Créer une zone |
+| PATCH | `/zones/{id}` | Modifier une zone |
+| DELETE | `/zones/{id}` | Supprimer une zone |
+
+<Aside type="tip">
+  Utilisez `?include=children` pour obtenir les zones enfants.
+</Aside>
+
+## Matériels
+
+| Méthode | Endpoint | Description |
+|---------|----------|-------------|
+| GET | `/materials` | Liste des matériels |
+| GET | `/materials/{id}` | Détail d'un matériel |
+| POST | `/materials` | Créer un matériel |
+| PATCH | `/materials/{id}` | Modifier un matériel |
+| DELETE | `/materials/{id}` | Supprimer un matériel |
+
+### Filtres disponibles
+
+```
+GET /materials?zone_id=5&status=active&search=compresseur
+```
+
+## Maintenances
+
+| Méthode | Endpoint | Description |
+|---------|----------|-------------|
+| GET | `/maintenances` | Liste des maintenances |
+| GET | `/maintenances/{id}` | Détail d'une maintenance |
+| POST | `/maintenances` | Créer une maintenance |
+| PATCH | `/maintenances/{id}` | Modifier une maintenance |
+| DELETE | `/maintenances/{id}` | Supprimer une maintenance |
+
+### Filtres
+
+```
+GET /maintenances?material_id=5&status=scheduled&type=preventive
+```
+
+## Incidents
+
+| Méthode | Endpoint | Description |
+|---------|----------|-------------|
+| GET | `/incidents` | Liste des incidents |
+| GET | `/incidents/{id}` | Détail d'un incident |
+| POST | `/incidents` | Signaler un incident |
+| PATCH | `/incidents/{id}` | Modifier un incident |
+| DELETE | `/incidents/{id}` | Supprimer un incident |
+
+### Filtres
+
+```
+GET /incidents?material_id=5&status=open&priority=high
+```
+
+## Nettoyages
+
+| Méthode | Endpoint | Description |
+|---------|----------|-------------|
+| GET | `/cleanings` | Liste des nettoyages |
+| GET | `/cleanings/{id}` | Détail d'un nettoyage |
+| POST | `/cleanings` | Créer un nettoyage |
+| PATCH | `/cleanings/{id}` | Modifier un nettoyage |
+| DELETE | `/cleanings/{id}` | Supprimer un nettoyage |
+
+## Inventaire (Items)
+
+| Méthode | Endpoint | Description |
+|---------|----------|-------------|
+| GET | `/items` | Liste des pièces |
+| GET | `/items/{id}` | Détail d'une pièce |
+| POST | `/items` | Créer une pièce |
+| PATCH | `/items/{id}` | Modifier une pièce |
+| DELETE | `/items/{id}` | Supprimer une pièce |
+
+## Mouvements de stock
+
+| Méthode | Endpoint | Description |
+|---------|----------|-------------|
+| GET | `/item-movements` | Liste des mouvements |
+| GET | `/items/{id}/movements` | Mouvements d'une pièce |
+| POST | `/item-movements` | Créer un mouvement |
+
+## Fournisseurs (HQ uniquement)
+
+<Aside type="caution">
+  Ces endpoints ne sont accessibles que depuis le Site Siège.
+</Aside>
+
+| Méthode | Endpoint | Description |
+|---------|----------|-------------|
+| GET | `/companies` | Liste des fournisseurs |
+| GET | `/companies/{id}` | Détail d'un fournisseur |
+| POST | `/companies` | Créer un fournisseur |
+| PATCH | `/companies/{id}` | Modifier un fournisseur |
+| DELETE | `/companies/{id}` | Supprimer un fournisseur |
+
+### Filtres
+
+```
+GET /companies?types[]=ITEM_PROVIDER&search=acme
+```
+
+## Utilisateurs
+
+| Méthode | Endpoint | Description |
+|---------|----------|-------------|
+| GET | `/users` | Liste des utilisateurs |
+| GET | `/users/{id}` | Détail d'un utilisateur |
+| POST | `/users` | Créer un utilisateur |
+| PATCH | `/users/{id}` | Modifier un utilisateur |
+| DELETE | `/users/{id}` | Supprimer un utilisateur |
+
+## Rôles
+
+| Méthode | Endpoint | Description |
+|---------|----------|-------------|
+| GET | `/roles` | Liste des rôles (site actuel) |
+| POST | `/roles` | Créer un rôle |
+| PATCH | `/roles/{id}` | Modifier un rôle |
+| DELETE | `/roles/{id}` | Supprimer un rôle |
+
+## Permissions
+
+| Méthode | Endpoint | Description |
+|---------|----------|-------------|
+| GET | `/permissions` | Liste des permissions |
+
+## Paramètres de requête communs
+
+| Paramètre | Description | Exemple |
+|-----------|-------------|---------|
+| `page` | Numéro de page | `?page=2` |
+| `per_page` | Résultats par page | `?per_page=25` |
+| `sort` | Tri | `?sort=name` ou `?sort=-created_at` |
+| `search` | Recherche textuelle | `?search=motclé` |
+| `include` | Relations à inclure | `?include=zone,company` |
+
+## Prochaines étapes
+
+- [Auth API](/XetaSuite-Site/api/auth/) - Endpoints d'authentification
+- [Déploiement Production](/XetaSuite-Site/deployment/production/) - Mettre en ligne

@@ -1,0 +1,111 @@
+---
+title: Create a company
+description: Guide for creating and managing Companies in XetaSuite.
+---
+
+import { Steps, Aside } from '@astrojs/starlight/components';
+
+**Companies** in XetaSuite represent parts suppliers and/or maintenance providers.
+
+<Aside type="note">
+  Company management is reserved for the **Headquarters Site**. You must be logged into the headquarters to access this feature.
+</Aside>
+
+## Company types
+
+A Company can have one or more types:
+
+| Type | Description |
+|------|-------------|
+| `ITEM_PROVIDER` | Spare parts supplier |
+| `MAINTENANCE_PROVIDER` | Maintenance contractor |
+
+## Create a Company
+
+<Steps>
+
+1. **Access the Companies module**
+
+   From the sidebar, click **Companies** (only available at headquarters).
+
+2. **Click "New company"**
+
+   The creation form opens in a modal.
+
+3. **Fill in the information**
+
+   | Field | Required | Description |
+   |-------|----------|-------------|
+   | Name | ✅ | Company name |
+   | Email | ❌ | Contact email |
+   | Phone | ❌ | Phone number |
+   | Address | ❌ | Postal address |
+   | Types | ✅ | Parts supplier and/or Maintenance provider |
+
+4. **Save**
+
+   Click **Create** to save.
+
+</Steps>
+
+## API - Create a Company
+
+### Endpoint
+
+```http
+POST /api/v1/companies
+```
+
+### Payload
+
+```json
+{
+    "name": "ACME Corp",
+    "email": "contact@acme.com",
+    "phone": "+1 555 123 4567",
+    "address": "123 Example Street, New York, NY 10001",
+    "types": ["ITEM_PROVIDER", "MAINTENANCE_PROVIDER"]
+}
+```
+
+### Response
+
+```json
+{
+    "data": {
+        "id": 1,
+        "name": "ACME Corp",
+        "email": "contact@acme.com",
+        "phone": "+1 555 123 4567",
+        "address": "123 Example Street, New York, NY 10001",
+        "types": ["ITEM_PROVIDER", "MAINTENANCE_PROVIDER"],
+        "item_count": 0,
+        "created_at": "2024-01-15T10:30:00Z",
+        "updated_at": "2024-01-15T10:30:00Z"
+    }
+}
+```
+
+## Required permissions
+
+| Action | Permission |
+|--------|------------|
+| View list | `company.viewAny` |
+| View a supplier | `company.view` |
+| Create | `company.create` |
+| Modify | `company.update` |
+| Delete | `company.delete` |
+
+## Deletion and data preservation
+
+When a Company is deleted:
+
+1. **Items** keep a reference to the company name (`company_name` field)
+2. **Item movements** preserve the supplier name
+3. **Item prices** preserve the supplier name
+
+This allows maintaining traceability even after a supplier is deleted.
+
+<Aside type="caution">
+  Deletion is permanent. Consider deactivating instead of deleting if you need to keep history.
+</Aside>

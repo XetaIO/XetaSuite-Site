@@ -1,0 +1,147 @@
+---
+title: Roles & Permissions
+description: Role and permission management system with Spatie Laravel-Permission.
+---
+
+import { Aside } from '@astrojs/starlight/components';
+
+XetaSuite uses [Spatie Laravel-Permission](https://spatie.be/docs/laravel-permission) with **teams** mode enabled to manage permissions per site.
+
+## Architecture
+
+```
+User ─┬─ Site 1 ─── Role: Admin ─── Permissions: [company.*, user.*, ...]
+      │
+      ├─ Site 2 ─── Role: Manager ─── Permissions: [material.*, zone.*, ...]
+      │
+      └─ Site 3 ─── Role: User ─── Permissions: [material.view, zone.view]
+```
+
+<Aside type="note">
+  Roles and permissions are **scoped by site**. A user can have different roles on each site.
+</Aside>
+
+## Configuration
+
+### `config/permission.php`
+
+```php
+'teams' => true,
+'team_foreign_key' => 'site_id',
+```
+
+## Assign a role
+
+```php
+// ⚠️ ALWAYS set site context BEFORE assignment
+setPermissionsTeamId($site->id);
+
+// Assign the role
+$user->assignRole('manager');
+
+// The role is saved with site_id in the pivot table
+```
+
+## Check permissions
+
+### In Policies
+
+```php
+class CompanyPolicy
+{
+    public function view(User $user, Company $company): bool
+    {
+        // Checks permission for current site
+        return $user->can('company.view');
+    }
+}
+```
+
+### In Controllers
+
+```php
+public function index(Request $request)
+{
+    // Via Gate
+    $this->authorize('viewAny', Company::class);
+
+    // Or directly
+    if ($request->user()->can('company.viewAny')) {
+        // ...
+    }
+}
+```
+
+### In React
+
+```tsx
+const { hasPermission, hasRole, hasAnyPermission } = useAuth();
+
+// Single permission
+{hasPermission('company.create') && <CreateButton />}
+
+// Multiple permissions (OR)
+{hasAnyPermission(['company.update', 'company.delete']) && <EditMenu />}
+
+// Role
+{hasRole('admin') && <AdminPanel />}
+```
+
+## Available permissions
+
+### Standard format
+
+```
+{resource}.{action}
+```
+
+| Action | Description |
+|--------|-------------|
+| `viewAny` | View list |
+| `view` | View single |
+| `create` | Create |
+| `update` | Update |
+| `delete` | Delete |
+
+### By module
+
+| Module | Permissions |
+|--------|-------------|
+| Sites | `site.viewAny`, `site.view`, `site.create`, `site.update`, `site.delete` |
+| Zones | `zone.viewAny`, `zone.view`, `zone.create`, `zone.update`, `zone.delete` |
+| Materials | `material.viewAny`, `material.view`, `material.create`, `material.update`, `material.delete`, `material.generateQrCode`, `material.scanQrCode` |
+| Maintenances | `maintenance.viewAny`, `maintenance.view`, `maintenance.create`, `maintenance.update`, `maintenance.delete` |
+| Incidents | `incident.viewAny`, `incident.view`, `incident.create`, `incident.update`, `incident.delete` |
+| Cleanings | `cleaning.viewAny`, `cleaning.view`, `cleaning.create`, `cleaning.update`, `cleaning.delete` |
+| Items | `item.viewAny`, `item.view`, `item.create`, `item.update`, `item.delete`, `item.generateQrCode`, `item.scanQrCode` |
+| Movements | `item-movement.viewAny`, `item-movement.view`, `item-movement.create`, `item-movement.update`, `item-movement.delete` |
+| Companies | `company.viewAny`, `company.view`, `company.create`, `company.update`, `company.delete` |
+| Users | `user.viewAny`, `user.view`, `user.create`, `user.update`, `user.delete`, `user.restore`, `user.assignDirectPermission`, `user.assignSite` |
+| Roles | `role.viewAny`, `role.view`, `role.create`, `role.update`, `role.delete` |
+| Permissions | `permission.viewAny`, `permission.view`, `permission.create`, `permission.update`, `permission.delete` |
+| Settings | `setting.viewAny`, `setting.view`, `setting.update`, |
+
+## Middleware chain
+
+The permission middleware runs after site context is set:
+
+```
+SetCurrentSite → SetCurrentPermissionsAndRoles → Controller
+```
+
+1. **SetCurrentSite** - Reads `user.current_site_id`, caches `is_on_headquarters`
+2. **SetCurrentPermissionsAndRoles** - Calls `setPermissionsTeamId(siteId)`, refreshes cached relations
+
+## HQ-only resources
+
+Some resources (Companies) are only accessible from the headquarters:
+
+```php
+public function before(User $user, string $ability): ?bool
+{
+    if (! isOnHeadquarters()) {
+        return false;  // Blocks access from regular sites
+    }
+    return null;  // Continue to specific check
+}
+```

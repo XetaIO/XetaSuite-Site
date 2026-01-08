@@ -1,0 +1,160 @@
+---
+title: Create a maintenance
+description: Guide for scheduling and managing maintenances in XetaSuite.
+---
+
+import { Steps, Aside } from '@astrojs/starlight/components';
+
+Maintenances allow you to track planned or completed interventions on equipment.
+
+## Maintenance types
+
+| Type | Description |
+|------|-------------|
+| `PREVENTIVE` | Regularly scheduled maintenance |
+| `CORRECTIVE` | Repair following a breakdown |
+| `INSPECTION` | Routine inspection and check |
+| `IMPROVEMENT` | Equipment upgrade or enhancement  |
+| `PREDICTIVE` | Based on data analysis (Not yet implemented) |
+
+## Maintenance statuses
+
+| Status | Description |
+|--------|-------------|
+| `SCHEDULED` | Planned, not started |
+| `IN_PROGRESS` | Currently in progress |
+| `COMPLETED` | Successfully completed |
+| `CANCELLED` | Cancelled |
+
+## Maintenance realization
+
+| Status | Description |
+|--------|-------------|
+| `INTERNAL` | Performed by internal team |
+| `EXTERNAL` | Performed by external contractor |
+| `BOTH` | Performed by both internal and external |
+
+## Create a maintenance
+
+<Steps>
+
+1. **Access the Maintenances module**
+
+   From the sidebar, click **Maintenances**.
+
+2. **Click "New maintenance"**
+
+3. **Select the equipment**
+
+   Choose the relevant equipment from the list.
+
+4. **Fill in the information**
+
+    | Field | Required | Description |
+    |-------|----------|-------------|
+    | Type | ✅ | Preventive, Corrective, Inspection, Improvement |
+    | Realization | ✅ | Internal, External, or Both |
+    | Status | ❌ | Planned, In Progress, Completed, Cancelled |
+    | Material | ❌ | Equipment to maintain |
+    | Start date | ❌ | Planned intervention date |
+    | Operators | ✅ | Users assigned to the maintenance |
+    | Companies | ✅ | Maintenance provider companies |
+    | Incidents | ❌ | Related incidents to link |
+    | Spare parts | ❌ | Parts used during maintenance |
+    | Description | ✅ | Intervention details |
+    | Reason | ✅ | Reason for the maintenance |
+
+5. **Save**
+
+   The maintenance is created with `SCHEDULED` status.
+
+</Steps>
+
+## Lifecycle
+
+```
+SCHEDULED → IN_PROGRESS → COMPLETED
+                ↓
+            CANCELLED
+```
+
+## API - Create a maintenance
+
+### Endpoint
+
+```http
+POST /api/v1/maintenances
+```
+
+### Payload
+
+```json
+{
+    "material_id": 1,
+    "type": "PREVENTIVE",
+    "scheduled_at": "2024-02-15T09:00:00Z",
+    "description": "Annual compressor service",
+    "company_id": 5
+}
+```
+
+### Response
+
+```json
+{
+    "data": {
+        "id": 1,
+        "material": {
+            "id": 1,
+            "name": "Compressor A1"
+        },
+        "type": "PREVENTIVE",
+        "status": "SCHEDULED",
+        "scheduled_at": "2024-02-15T09:00:00Z",
+        "description": "Annual compressor service",
+        "company": {
+            "id": 5,
+            "name": "Tech Services Inc"
+        },
+        "created_by": {
+            "id": 1,
+            "full_name": "John Doe"
+        }
+    }
+}
+```
+
+## Update maintenance status
+
+### Start intervention
+
+```http
+PATCH /api/v1/maintenances/{id}
+```
+
+```json
+{
+    "status": "IN_PROGRESS",
+    "started_at": "2024-02-15T09:30:00Z"
+}
+```
+
+### Complete intervention
+
+```json
+{
+    "status": "COMPLETED",
+    "completed_at": "2024-02-15T14:00:00Z",
+    "notes": "Replaced air filter and checked oil level."
+}
+```
+
+## Required permissions
+
+| Action | Permission |
+|--------|------------|
+| View list | `maintenance.viewAny` |
+| View a maintenance | `maintenance.view` |
+| Create | `maintenance.create` |
+| Modify | `maintenance.update` |
+| Delete | `maintenance.delete` |

@@ -1,0 +1,114 @@
+---
+title: Créer un fournisseur
+description: Guide pour créer et gérer les fournisseurs (Companies) dans XetaSuite.
+---
+
+import { Steps, Aside } from '@astrojs/starlight/components';
+
+Les **Companies** dans XetaSuite représentent les fournisseurs de pièces et/ou les prestataires de maintenance.
+
+<Aside type="note">
+  La gestion des Companies est réservée au **Site Siège** (Headquarters). Vous devez être connecté sur le siège pour accéder à cette fonctionnalité.
+</Aside>
+
+## Types de Companies
+
+Une Company peut avoir un ou plusieurs types :
+
+| Type | Description |
+|------|-------------|
+| `ITEM_PROVIDER` | Fournisseur de pièces détachées |
+| `MAINTENANCE_PROVIDER` | Prestataire de maintenance |
+
+## Créer une Company
+
+<Steps>
+
+1. **Accéder au module Fournisseurs**
+
+   Depuis le menu latéral, cliquez sur **Fournisseurs** (disponible uniquement sur le siège).
+
+2. **Cliquer sur "Nouveau fournisseur"**
+
+   Le formulaire de création s'ouvre en modal.
+
+3. **Remplir les informations**
+
+   | Champ | Obligatoire | Description |
+   |-------|-------------|-------------|
+   | Nom | ✅ | Nom de l'entreprise |
+   | Email | ❌ | Email de contact |
+   | Téléphone | ❌ | Numéro de téléphone |
+   | Adresse | ❌ | Adresse postale |
+   | Types | ✅ | Fournisseur pièces et/ou Maintenancier |
+
+4. **Enregistrer**
+
+   Cliquez sur **Créer** pour sauvegarder.
+
+</Steps>
+
+## API - Créer une Company
+
+### Endpoint
+
+```http
+POST /api/v1/companies
+```
+
+### Payload
+
+```json
+{
+    "name": "ACME Corp",
+    "email": "contact@acme.com",
+    "phone": "+33 1 23 45 67 89",
+    "address": "123 Rue Example, 75001 Paris",
+    "types": ["ITEM_PROVIDER", "MAINTENANCE_PROVIDER"]
+}
+```
+
+### Réponse
+
+```json
+{
+    "data": {
+        "id": 1,
+        "name": "ACME Corp",
+        "email": "contact@acme.com",
+        "phone": "+33 1 23 45 67 89",
+        "address": "123 Rue Example, 75001 Paris",
+        "types": ["ITEM_PROVIDER", "MAINTENANCE_PROVIDER"],
+        "item_count": 0,
+        "created_at": "2024-01-15T10:30:00Z",
+        "updated_at": "2024-01-15T10:30:00Z"
+    }
+}
+```
+
+## Permissions requises
+
+| Action | Permission |
+|--------|------------|
+| Voir la liste | `company.viewAny` |
+| Voir un fournisseur | `company.view` |
+| Créer | `company.create` |
+| Modifier | `company.update` |
+| Supprimer | `company.delete` |
+
+## Suppression et préservation des données
+
+Lorsqu'une Company est supprimée :
+
+1. Les **Items** liés conservent le nom du fournisseur dans `company_name`
+2. Les **ItemMovements** conservent également le nom
+3. Les **ItemPrices** conservent le nom
+
+<Aside type="tip">
+  Cette préservation est gérée automatiquement par le `CompanyObserver` avant la suppression.
+</Aside>
+
+## Prochaines étapes
+
+- [Mouvements de pièces](/XetaSuite-Site/guides/item-movements/) - Gérer les entrées/sorties de stock
+- [Créer une maintenance](/XetaSuite-Site/guides/create-maintenance/) - Planifier une maintenance

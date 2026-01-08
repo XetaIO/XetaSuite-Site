@@ -1,0 +1,91 @@
+---
+title: Multi-Sites & Zones
+description: Multi-tenant architecture with site and nested zone management.
+---
+
+import { Aside } from '@astrojs/starlight/components';
+
+XetaSuite is designed to manage **multiple sites** (multi-tenant), each with its own zones, equipment and permissions.
+
+## Entity Hierarchy
+
+```
+Organization
+└── Sites
+    ├── Headquarters (is_headquarters = true)
+    │   └── Manages Companies globally
+    │
+    └── Regular Sites
+        └── Zones (nested)
+            └── Materials
+                ├── Maintenances
+                ├── Incidents
+                └── Cleanings
+```
+
+## Headquarters Site
+
+<Aside type="note">
+  The **Headquarters Site** (`is_headquarters = true`) is a special site that manages global resources like Companies (suppliers).
+</Aside>
+
+### HQ-Only Resources
+
+| Resource | Description |
+|----------|-------------|
+| Companies | Part suppliers and/or maintenance contractors |
+
+### Policy Protection
+
+```php
+class CompanyPolicy
+{
+    public function before(User $user, string $ability): ?bool
+    {
+        // Block access if user is not on headquarters
+        if (! isOnHeadquarters()) {
+            return false;
+        }
+        return null; // Continue to permission check
+    }
+}
+```
+
+## Site Switching
+
+Users can switch sites via the **SiteSwitcher**:
+
+```typescript
+// Frontend - SiteSwitcher.tsx
+const handleSiteChange = async (site: UserSite) => {
+    await switchSite(site.id);  // PATCH /api/v1/user/site
+    window.location.reload();   // Reload permissions
+};
+```
+
+<Aside type="caution">
+  A **page reload** is required after switching sites to refresh permissions in the React context.
+</Aside>
+
+## User Data Structure
+
+```typescript
+interface User {
+    id: number;
+    current_site_id?: number;
+    roles: string[];        // Roles for current site
+    permissions: string[];  // Permissions for current site
+    sites: UserSite[];      // All accessible sites
+}
+
+interface UserSite {
+    id: number;
+    name: string;
+    is_headquarters: boolean;
+}
+```
+
+## Next Steps
+
+- [User Management](/XetaSuite-Site/en/admin/users/) - Create and manage users
+- [Role Management](/XetaSuite-Site/en/admin/roles/) - Configure roles per site

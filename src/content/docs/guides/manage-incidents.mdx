@@ -1,0 +1,163 @@
+---
+title: Gérer les incidents
+description: Guide pour signaler et gérer les incidents sur les matériels.
+---
+
+import { Steps, Aside } from '@astrojs/starlight/components';
+
+Les incidents permettent de signaler et suivre les problèmes sur les équipements.
+
+## Priorités
+
+| Priorité | Description |
+|----------|-------------|
+| `LOW` | Impact faible, peut attendre |
+| `MEDIUM` | Impact modéré, à traiter rapidement |
+| `HIGH` | Impact important, urgent |
+| `CRITICAL` | Bloquant, intervention immédiate |
+
+## Statuts
+
+| Statut | Description |
+|--------|-------------|
+| `OPEN` | Signalé, non pris en charge |
+| `IN_PROGRESS` | En cours de résolution |
+| `RESOLVED` | Résolu |
+| `CLOSED` | Fermé après validation |
+
+## Signaler un incident
+
+<Steps>
+
+1. **Accéder au module Incidents**
+
+   Depuis le menu latéral, cliquez sur **Incidents**.
+
+2. **Cliquer sur "Nouvel incident"**
+
+3. **Remplir le formulaire**
+
+   | Champ | Obligatoire | Description |
+   |-------|-------------|-------------|
+   | Matériel | ✅ | Équipement concerné |
+   | Titre | ✅ | Description courte |
+   | Priorité | ✅ | Low, Medium, High, Critical |
+   | Description | ✅ | Détails du problème |
+
+4. **Enregistrer**
+
+   L'incident est créé avec le statut `OPEN`.
+
+</Steps>
+
+## Cycle de vie
+
+```
+OPEN → IN_PROGRESS → RESOLVED → CLOSED
+          ↓             ↓
+        OPEN ←────────┘
+```
+
+<Aside type="note">
+  Un incident peut être rouvert (`OPEN`) depuis `IN_PROGRESS` ou `RESOLVED` si le problème persiste.
+</Aside>
+
+## API - Signaler un incident
+
+### Endpoint
+
+```http
+POST /api/v1/incidents
+```
+
+### Payload
+
+```json
+{
+    "material_id": 1,
+    "title": "Bruit anormal sur compresseur",
+    "priority": "HIGH",
+    "description": "Le compresseur émet un bruit de claquement depuis ce matin. Fonctionnement dégradé."
+}
+```
+
+### Réponse
+
+```json
+{
+    "data": {
+        "id": 1,
+        "material": {
+            "id": 1,
+            "name": "Compresseur A1"
+        },
+        "title": "Bruit anormal sur compresseur",
+        "priority": "HIGH",
+        "status": "OPEN",
+        "description": "Le compresseur émet un bruit...",
+        "reported_by": {
+            "id": 5,
+            "full_name": "Jean Dupont"
+        },
+        "reported_at": "2024-01-15T14:30:00Z",
+        "resolved_at": null
+    }
+}
+```
+
+## Prendre en charge un incident
+
+```http
+PATCH /api/v1/incidents/{id}
+```
+
+```json
+{
+    "status": "IN_PROGRESS",
+    "assigned_to": 10
+}
+```
+
+## Résoudre un incident
+
+```json
+{
+    "status": "RESOLVED",
+    "resolution": "Remplacement du roulement défectueux. Compresseur opérationnel.",
+    "resolved_at": "2024-01-15T17:00:00Z"
+}
+```
+
+## Convertir en maintenance
+
+Un incident peut générer une maintenance corrective :
+
+```http
+POST /api/v1/incidents/{id}/create-maintenance
+```
+
+```json
+{
+    "scheduled_at": "2024-01-16T09:00:00Z",
+    "company_id": 5
+}
+```
+
+<Aside type="tip">
+  La conversion en maintenance lie automatiquement l'incident à la maintenance créée.
+</Aside>
+
+## Permissions requises
+
+| Action | Permission |
+|--------|------------|
+| Voir la liste | `incident.viewAny` |
+| Voir un incident | `incident.view` |
+| Créer | `incident.create` |
+| Modifier | `incident.update` |
+| Supprimer | `incident.delete` |
+
+## Prochaines étapes
+
+- [Créer une maintenance](/XetaSuite-Site/guides/create-maintenance/) - Planifier une intervention
+- [Mouvements de pièces](/XetaSuite-Site/guides/item-movements/) - Gérer le stock

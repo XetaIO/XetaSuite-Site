@@ -1,0 +1,144 @@
+---
+title: Permission Management
+description: Guide on XetaSuite's granular permission system.
+---
+
+import { Aside } from '@astrojs/starlight/components';
+
+## Permission format
+
+```
+{resource}.{action}
+```
+
+### Standard actions
+
+| Action | Description |
+|--------|-------------|
+| `viewAny` | View the list of resources |
+| `view` | View a specific resource |
+| `create` | Create a new resource |
+| `update` | Modify a resource |
+| `delete` | Delete a resource |
+
+## Complete list of permissions
+
+### Site management
+
+| Permission | Description |
+|------------|-------------|
+| `site.viewAny` | View site list |
+| `site.view` | View a site |
+| `site.create` | Create a site |
+| `site.update` | Modify a site |
+| `site.delete` | Delete a site |
+
+### Zone management
+
+| Permission | Description |
+|------------|-------------|
+| `zone.viewAny` | View zone list |
+| `zone.view` | View a zone |
+| `zone.create` | Create a zone |
+| `zone.update` | Modify a zone |
+| `zone.delete` | Delete a zone |
+
+### Material management
+
+| Permission | Description |
+|------------|-------------|
+| `material.viewAny` | View material list |
+| `material.view` | View a material |
+| `material.create` | Create a material |
+| `material.update` | Modify a material |
+| `material.delete` | Delete a material |
+
+### Maintenance management
+
+| Permission | Description |
+|------------|-------------|
+| `maintenance.viewAny` | View maintenance list |
+| `maintenance.view` | View a maintenance |
+| `maintenance.create` | Create a maintenance |
+| `maintenance.update` | Modify a maintenance |
+| `maintenance.delete` | Delete a maintenance |
+
+### Incident management
+
+| Permission | Description |
+|------------|-------------|
+| `incident.viewAny` | View incident list |
+| `incident.view` | View an incident |
+| `incident.create` | Report an incident |
+| `incident.update` | Modify an incident |
+| `incident.delete` | Delete an incident |
+
+### Cleaning management
+
+| Permission | Description |
+|------------|-------------|
+| `cleaning.viewAny` | View cleaning list |
+| `cleaning.view` | View a cleaning |
+| `cleaning.create` | Create a cleaning |
+| `cleaning.update` | Modify a cleaning |
+| `cleaning.delete` | Delete a cleaning |
+
+### Inventory management
+
+| Permission | Description |
+|------------|-------------|
+| `item.viewAny` | View part list |
+| `item.view` | View a part |
+| `item.create` | Create a part |
+| `item.update` | Modify a part |
+| `item.delete` | Delete a part |
+| `item-movement.viewAny` | View movements |
+| `item-movement.create` | Create a movement |
+
+### Supplier management (HQ)
+
+<Aside type="note">
+  These permissions are only available on the Headquarters site.
+</Aside>
+
+| Permission | Description |
+|------------|-------------|
+| `company.viewAny` | View supplier list |
+| `company.view` | View a supplier |
+| `company.create` | Create a supplier |
+| `company.update` | Modify a supplier |
+| `company.delete` | Delete a supplier |
+
+### User management
+
+| Permission | Description |
+|------------|-------------|
+| `user.viewAny` | View user list |
+| `user.view` | View a user |
+| `user.create` | Create a user |
+| `user.update` | Modify a user |
+| `user.delete` | Delete a user |
+
+## Check permissions in React
+
+```tsx
+import { useAuth } from '@/features/Auth/hooks';
+
+function MyComponent() {
+    const { hasPermission, hasAnyPermission, hasRole } = useAuth();
+
+    return (
+        <div>
+            {hasPermission('company.create') && (
+                <button>Create Supplier</button>
+            )}
+
+            {hasAnyPermission(['company.update', 'company.delete']) && (
+                <EditMenu />
+            )}
+
+            {hasRole('admin') && <AdminPanel />}
+        </div>
+    );
+}
+```

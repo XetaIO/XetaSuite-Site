@@ -1,0 +1,133 @@
+---
+title: Gestion des utilisateurs
+description: Guide d'administration des utilisateurs dans XetaSuite.
+---
+
+import { Steps, Aside } from '@astrojs/starlight/components';
+
+## Créer un utilisateur
+
+<Steps>
+
+1. **Accéder au module Utilisateurs**
+
+   Depuis le menu latéral, cliquez sur **Administration** → **Utilisateurs**.
+
+2. **Cliquer sur "Nouvel utilisateur"**
+
+3. **Remplir les informations**
+
+   | Champ | Obligatoire | Description |
+   |-------|-------------|-------------|
+   | Prénom | ✅ | Prénom de l'utilisateur |
+   | Nom | ✅ | Nom de famille |
+   | Email | ✅ | Email unique (login) |
+   | Username | ✅ | Identifiant unique |
+   | Mot de passe | ✅ | Min. 8 caractères |
+   | Langue | ✅ | fr ou en |
+
+4. **Assigner un site**
+
+   Sélectionnez le site initial de l'utilisateur.
+
+5. **Assigner un rôle**
+
+   Choisissez le rôle pour ce site.
+
+6. **Enregistrer**
+
+</Steps>
+
+## API - Créer un utilisateur
+
+### Endpoint
+
+```http
+POST /api/v1/users
+```
+
+### Payload
+
+```json
+{
+    "first_name": "Jean",
+    "last_name": "Dupont",
+    "email": "jean.dupont@example.com",
+    "username": "jdupont",
+    "password": "SecurePass123!",
+    "password_confirmation": "SecurePass123!",
+    "locale": "fr",
+    "site_id": 1,
+    "role": "manager"
+}
+```
+
+## Assigner des sites supplémentaires
+
+Un utilisateur peut avoir accès à plusieurs sites avec des rôles différents :
+
+```http
+POST /api/v1/users/{id}/sites
+```
+
+```json
+{
+    "site_id": 2,
+    "role": "user"
+}
+```
+
+<Aside type="note">
+  Chaque site peut avoir un rôle différent. L'utilisateur change de site via le SiteSwitcher.
+</Aside>
+
+## Modifier les permissions
+
+### Changer le rôle sur un site
+
+```http
+PATCH /api/v1/users/{id}/sites/{site_id}
+```
+
+```json
+{
+    "role": "admin"
+}
+```
+
+### Retirer l'accès à un site
+
+```http
+DELETE /api/v1/users/{id}/sites/{site_id}
+```
+
+## Désactiver un utilisateur
+
+```http
+PATCH /api/v1/users/{id}
+```
+
+```json
+{
+    "is_active": false
+}
+```
+
+<Aside type="caution">
+  Un utilisateur désactivé ne peut plus se connecter mais ses données sont conservées.
+</Aside>
+
+## Permissions requises
+
+| Action | Permission |
+|--------|------------|
+| Voir la liste | `user.viewAny` |
+| Voir un utilisateur | `user.view` |
+| Créer | `user.create` |
+| Modifier | `user.update` |
+| Supprimer | `user.delete` |
+
+## Prochaines étapes
+
+- [Gestion des rôles](/XetaSuite-Site/admin/roles/) - Créer et configurer les rôles
+- [Gestion des permissions](/XetaSuite-Site/admin/permissions/) - Permissions granulaires

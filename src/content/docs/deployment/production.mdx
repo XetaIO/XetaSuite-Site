@@ -1,0 +1,195 @@
+---
+title: Déploiement Production
+description: Guide de déploiement de XetaSuite en production.
+---
+
+import { Steps, Tabs, TabItem, Aside } from '@astrojs/starlight/components';
+
+## Prérequis serveur
+
+### Backend
+- PHP 8.2+ avec extensions : `pdo_pgsql`, `mbstring`, `xml`, `curl`, `zip`
+- Composer 2.x
+- PostgreSQL 16, 17 ou 18
+- Redis (recommandé pour cache/queues)
+- Nginx ou Apache
+
+### Frontend
+- Node.js 20+ (pour le build)
+- Serveur web statique (Nginx, Vercel, Netlify...)
+
+## Déploiement Backend
+
+<Steps>
+
+1. **Cloner et installer**
+
+   ```bash
+   git clone https://github.com/xetaio/XetaSuite-core.git
+   cd XetaSuite-core
+   composer install --no-dev --optimize-autoloader
+   ```
+
+2. **Configurer l'environnement**
+
+   ```bash
+   cp .env.example .env
+   php artisan key:generate
+   ```
+
+   Éditez `.env` :
+   ```env
+   APP_ENV=production
+   APP_DEBUG=false
+   APP_URL=https://api.xetasuite.com
+
+   DB_CONNECTION=pgsql
+   DB_HOST=your-db-host
+   DB_DATABASE=xetasuite
+   DB_USERNAME=your-user
+   DB_PASSWORD=your-password
+
+   SANCTUM_STATEFUL_DOMAINS=app.xetasuite.com
+   SESSION_DOMAIN=.xetasuite.com
+   FRONTEND_URL=https://app.xetasuite.com
+
+   QUEUE_CONNECTION=redis
+   CACHE_DRIVER=redis
+   SESSION_DRIVER=redis
+   ```
+
+3. **Optimiser pour la production**
+
+   ```bash
+   php artisan config:cache
+   php artisan route:cache
+   php artisan view:cache
+   php artisan event:cache
+   ```
+
+4. **Exécuter les migrations**
+
+   ```bash
+   php artisan migrate --force
+   ```
+
+5. **Configurer le storage**
+
+   ```bash
+   php artisan storage:link
+   ```
+
+</Steps>
+
+## Configuration Nginx (Backend)
+
+```nginx
+server {
+    listen 443 ssl http2;
+    server_name api.xetasuite.com;
+
+    root /var/www/xetasuite-core/public;
+    index index.php;
+
+    ssl_certificate /path/to/certificate.crt;
+    ssl_certificate_key /path/to/private.key;
+
+    add_header X-Frame-Options "SAMEORIGIN";
+    add_header X-Content-Type-Options "nosniff";
+
+    location / {
+        try_files $uri $uri/ /index.php?$query_string;
+    }
+
+    location ~ \.php$ {
+        fastcgi_pass unix:/var/run/php/php8.3-fpm.sock;
+        fastcgi_param SCRIPT_FILENAME $realpath_root$fastcgi_script_name;
+        include fastcgi_params;
+    }
+
+    location ~ /\.(?!well-known).* {
+        deny all;
+    }
+}
+```
+
+## Déploiement Frontend
+
+<Steps>
+
+1. **Build de production**
+
+   ```bash
+   cd XetaSuite-React
+   npm install
+   npm run build
+   ```
+
+2. **Configurer l'environnement**
+
+   Créez `.env.production` :
+   ```env
+   VITE_API_URL=https://api.xetasuite.com
+   ```
+
+3. **Déployer le dossier `dist/`**
+
+   Uploadez le contenu de `dist/` sur votre hébergement.
+
+</Steps>
+
+## Configuration Nginx (Frontend SPA)
+
+```nginx
+server {
+    listen 443 ssl http2;
+    server_name app.xetasuite.com;
+
+    root /var/www/xetasuite-react/dist;
+    index index.html;
+
+    ssl_certificate /path/to/certificate.crt;
+    ssl_certificate_key /path/to/private.key;
+
+    # SPA: toutes les routes vers index.html
+    location / {
+        try_files $uri $uri/ /index.html;
+    }
+
+    # Cache des assets
+    location ~* \.(js|css|png|jpg|jpeg|gif|ico|svg|woff|woff2)$ {
+        expires 1y;
+        add_header Cache-Control "public, immutable";
+    }
+}
+```
+
+<Aside type="caution">
+  La directive `try_files $uri $uri/ /index.html;` est **critique** pour le routing SPA.
+</Aside>
+
+## Déploiement avec Laravel Forge
+
+<Tabs>
+  <TabItem label="Backend">
+    1. Créer un site `api.xetasuite.com`
+    2. Configurer le repository Git
+    3. Ajouter les variables d'environnement
+    4. Activer Queue Workers et Scheduler
+  </TabItem>
+  <TabItem label="Frontend">
+    1. Créer un site statique `app.xetasuite.com`
+    2. Dans le deploy script, ajouter :
+       ```bash
+       npm install
+       npm run build
+       ```
+    3. Définir `dist` comme web directory
+    4. Configurer le fallback vers `index.html`
+  </TabItem>
+</Tabs>
+
+## Prochaines étapes
+
+- [Queue Workers](/XetaSuite-Site/deployment/queue-workers/) - Configurer les workers
+- [Cron & Scheduler](/XetaSuite-Site/deployment/cron/) - Tâches planifiées

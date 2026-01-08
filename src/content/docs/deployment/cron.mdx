@@ -1,0 +1,157 @@
+---
+title: Cron & Scheduler
+description: Configuration du scheduler Laravel pour les tâches planifiées.
+---
+
+import { Tabs, TabItem, Aside } from '@astrojs/starlight/components';
+
+Laravel Scheduler permet de définir des tâches planifiées dans le code plutôt que dans le crontab.
+
+## Configuration du Cron
+
+Ajoutez une seule entrée cron pour exécuter le scheduler Laravel :
+
+```bash
+* * * * * cd /var/www/xetasuite-core && php artisan schedule:run >> /dev/null 2>&1
+```
+
+<Tabs>
+  <TabItem label="Linux">
+    ```bash
+    crontab -e
+    ```
+    Ajoutez la ligne ci-dessus.
+  </TabItem>
+  <TabItem label="Laravel Forge">
+    1. Aller dans **Servers** → votre serveur
+    2. Cliquez sur **Scheduler**
+    3. Cochez **Enable Scheduler** pour le site
+  </TabItem>
+</Tabs>
+
+## Tâches planifiées de XetaSuite
+
+Les tâches sont définies dans `routes/console.php` :
+
+```php
+use Illuminate\Support\Facades\Schedule;
+
+// Nettoyage des sessions expirées
+Schedule::command('session:gc')->daily();
+
+// Purge des jobs en échec anciens
+Schedule::command('queue:prune-failed --hours=48')->daily();
+
+// Backup quotidien
+Schedule::command('backup:run')->dailyAt('02:00');
+
+// Nettoyage des logs
+Schedule::command('backup:clean')->dailyAt('03:00');
+```
+
+## Commandes utiles
+
+### Voir les tâches planifiées
+
+```bash
+php artisan schedule:list
+```
+
+### Exécuter manuellement le scheduler
+
+```bash
+php artisan schedule:run
+```
+
+### Exécuter une commande spécifique
+
+```bash
+php artisan backup:run
+```
+
+## Backups
+
+<Aside type="note">
+  XetaSuite utilise `spatie/laravel-backup` pour les sauvegardes automatiques.
+</Aside>
+
+### Configuration
+
+Éditez `config/backup.php` :
+
+```php
+'backup' => [
+    'name' => env('APP_NAME', 'xetasuite'),
+    'source' => [
+        'files' => [
+            'include' => [base_path()],
+            'exclude' => [
+                base_path('vendor'),
+                base_path('node_modules'),
+            ],
+        ],
+        'databases' => ['pgsql'],
+    ],
+    'destination' => [
+        'disks' => ['s3'],  // ou 'local'
+    ],
+],
+```
+
+### Exécuter un backup manuel
+
+```bash
+# Backup complet (fichiers + DB)
+php artisan backup:run
+
+# Backup DB uniquement
+php artisan backup:run --only-db
+
+# Backup fichiers uniquement
+php artisan backup:run --only-files
+```
+
+### Notifications
+
+Configurez les notifications d'échec dans `config/backup.php` :
+
+```php
+'notifications' => [
+    'mail' => [
+        'to' => 'admin@xetasuite.com',
+    ],
+],
+```
+
+## Maintenance planifiée
+
+### Activer le mode maintenance
+
+```bash
+php artisan down --secret="your-secret-token"
+```
+
+Accédez avec : `https://api.xetasuite.com/your-secret-token`
+
+### Désactiver le mode maintenance
+
+```bash
+php artisan up
+```
+
+## Logs du scheduler
+
+Les logs du scheduler sont dans `storage/logs/laravel.log`.
+
+Pour des logs dédiés :
+
+```php
+Schedule::command('backup:run')
+    ->dailyAt('02:00')
+    ->appendOutputTo(storage_path('logs/backup.log'));
+```
+
+## Prochaines étapes
+
+- [Queue Workers](/XetaSuite-Site/deployment/queue-workers/) - Configurer les workers
+- [Déploiement Production](/XetaSuite-Site/deployment/production/) - Guide complet
