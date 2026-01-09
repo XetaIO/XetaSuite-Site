@@ -16,7 +16,7 @@ export default defineConfig({
 			lastUpdated: true,
 			favicon: '/favicon.svg',
 			editLink: {
-				baseUrl: 'https://github.com/XetaIO/XetaSuite-Site/edit/main/',
+				baseUrl: 'https://github.com/XetaIO/edit/main/',
 			},
 			defaultLocale: 'en',
 			locales: {
