@@ -4,7 +4,7 @@ import starlight from '@astrojs/starlight';
 
 // https://astro.build/config
 export default defineConfig({
-	site: 'https://xetasuite.github.io',
+	site: 'https://xetasuite.xetaravel.com',
 	base: '/XetaSuite-Site',
 	integrations: [
 		starlight({
