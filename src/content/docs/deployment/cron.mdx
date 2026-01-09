@@ -45,7 +45,7 @@ Schedule::command('queue:prune-failed --hours=48')->daily();
 // Backup quotidien
 Schedule::command('backup:run')->dailyAt('02:00');
 
-// Nettoyage des logs
+// Nettoyage des anciens backups
 Schedule::command('backup:clean')->dailyAt('03:00');
 ```
 
@@ -98,60 +98,38 @@ php artisan backup:run
 ],
 ```
 
-### Exécuter un backup manuel
+### Commandes disponibles
 
 ```bash
-# Backup complet (fichiers + DB)
+# Exécuter le backup
 php artisan backup:run
 
-# Backup DB uniquement
+# Exécuter le backup (base de données uniquement)
 php artisan backup:run --only-db
 
-# Backup fichiers uniquement
-php artisan backup:run --only-files
+# Lister les backups
+php artisan backup:list
+
+# Nettoyer les anciens backups
+php artisan backup:clean
 ```
 
-### Notifications
+## Monitoring
 
-Configurez les notifications d'échec dans `config/backup.php` :
-
-```php
-'notifications' => [
-    'mail' => [
-        'to' => 'admin@xetasuite.com',
-    ],
-],
-```
-
-## Maintenance planifiée
-
-### Activer le mode maintenance
+### Vérifier que le scheduler fonctionne
 
 ```bash
-php artisan down --secret="your-secret-token"
+php artisan schedule:list
 ```
 
-Accédez avec : `https://api.xetasuite.com/your-secret-token`
-
-### Désactiver le mode maintenance
+### Voir les logs
 
 ```bash
-php artisan up
+tail -f storage/logs/laravel.log
 ```
 
-## Logs du scheduler
+### Jobs en échec
 
-Les logs du scheduler sont dans `storage/logs/laravel.log`.
-
-Pour des logs dédiés :
-
-```php
-Schedule::command('backup:run')
-    ->dailyAt('02:00')
-    ->appendOutputTo(storage_path('logs/backup.log'));
+```bash
+php artisan queue:failed
 ```
-
-## Prochaines étapes
-
-- [Queue Workers](/deployment/queue-workers/) - Configurer les workers
-- [Déploiement Production](/deployment/production/) - Guide complet

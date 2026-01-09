@@ -52,6 +52,8 @@ import { Aside } from '@astrojs/starlight/components';
 | `material.create` | Create a material |
 | `material.update` | Modify a material |
 | `material.delete` | Delete a material |
+| `material.generateQrCode` | Generate material's QRCode |
+| `material.scanQrCode` | Scan material's QRCode |
 
 ### Maintenance management
 
@@ -83,7 +85,7 @@ import { Aside } from '@astrojs/starlight/components';
 | `cleaning.update` | Modify a cleaning |
 | `cleaning.delete` | Delete a cleaning |
 
-### Inventory management
+### Items management
 
 | Permission | Description |
 |------------|-------------|
@@ -92,13 +94,22 @@ import { Aside } from '@astrojs/starlight/components';
 | `item.create` | Create a part |
 | `item.update` | Modify a part |
 | `item.delete` | Delete a part |
+| `item.generateQrCode` | Generate item's QRCode |
+| `item.scanQrCode` | Scan item's QRCode |
+
+### ItemMovements management
+
+| Permission | Description |
+|------------|-------------|
 | `item-movement.viewAny` | View movements |
 | `item-movement.create` | Create a movement |
+| `item-movement.update` | Update a movement |
+| `item-movement.delete` | Delete a movement |
 
-### Supplier management (HQ)
+### Companies management (HQ)
 
 <Aside type="note">
-  These permissions are only available on the Headquarters site.
+  `Create`, `Update` & `Delete` permissions are only available on the Headquarters site.
 </Aside>
 
 | Permission | Description |
@@ -118,6 +129,10 @@ import { Aside } from '@astrojs/starlight/components';
 | `user.create` | Create a user |
 | `user.update` | Modify a user |
 | `user.delete` | Delete a user |
+| `user.restore` | Restore a user |
+| `user.assignDirectPermission` | Assign direct permissions to user |
+| `user.assignSite` | Assign sites to user |
+
 
 ## Check permissions in React
 
@@ -125,7 +140,7 @@ import { Aside } from '@astrojs/starlight/components';
 import { useAuth } from '@/features/Auth/hooks';
 
 function MyComponent() {
-    const { hasPermission, hasAnyPermission, hasRole } = useAuth();
+    const { hasPermission, hasAnyPermission, hasRole, hasAnyRole } = useAuth();
 
     return (
         <div>
@@ -138,6 +153,8 @@ function MyComponent() {
             )}
 
             {hasRole('admin') && <AdminPanel />}
+
+            {hasAnyRole(['admin', 'manager']) && <AdminPanel />}
         </div>
     );
 }

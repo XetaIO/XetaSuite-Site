@@ -9,7 +9,7 @@ XetaSuite utilise **Laravel Sanctum** en mode **stateful** (cookies) pour l'auth
 
 ## Flow d'authentification
 
-```mermaid
+```batch
 sequenceDiagram
     participant SPA as React SPA
     participant Laravel as Laravel Backend
@@ -38,14 +38,6 @@ sequenceDiagram
 'paths' => ['api/*', 'sanctum/csrf-cookie'],
 'allowed_origins' => [env('FRONTEND_URL', 'http://localhost:5173')],
 'supports_credentials' => true,
-```
-
-### Session (`config/session.php`)
-
-```php
-'driver' => env('SESSION_DRIVER', 'database'),
-'domain' => env('SESSION_DOMAIN', null),
-'same_site' => 'lax',
 ```
 
 ## Configuration Frontend
@@ -83,7 +75,7 @@ const httpClient = axios.create({
 
    ```typescript
    await httpClient.post('/api/v1/auth/login', {
-       email: 'user@example.com',
+       email: 'admin@xetasuite.test',
        password: 'password',
        remember: true
    });
@@ -102,7 +94,13 @@ const httpClient = axios.create({
 
 ```typescript
 // Dans les composants React
-const { hasPermission, hasRole } = useAuth();
+const {
+    hasPermission,
+    hasRole,
+    hasAnyPermission,
+    hasAnyRole,
+    isOnHeadquarters
+} = useAuth();
 
 // Vérifier une permission
 if (hasPermission('company.create')) {
@@ -113,29 +111,21 @@ if (hasPermission('company.create')) {
 if (hasRole('admin')) {
     // Afficher le panel admin
 }
-```
 
-## Logout
+// Vérifier plusieurs permissions
+if (hasAnyPermission(['company.update', 'company.delete'])) {
+    // Afficher le menu
+}
 
-```typescript
-await axios.get('/sanctum/csrf-cookie');
-await httpClient.post('/api/v1/auth/logout');
-// Rediriger vers /auth/login
-```
+// Vérifier plusieurs rôles
+if (hasRole(['admin', 'manager'])) {
+    // Afficher le bouton d'édition utilisateur
+}
 
-## Résolution de problèmes
-
-### Erreur 401 sur les requêtes API
-
-1. Vérifiez que `/sanctum/csrf-cookie` est appelé avant le login
-2. Vérifiez que `withCredentials: true` est configuré
-3. Vérifiez les domaines dans `SANCTUM_STATEFUL_DOMAINS`
-
-### Cookie non envoyé
-
-Vérifiez que le domaine du frontend correspond à `SESSION_DOMAIN` :
-```env
-SESSION_DOMAIN=.xetasuite.test  # Le point permet les sous-domaines
+// Vérifier si l'utilisateur est sur le site siège
+if (isOnHeadquarters()) {
+    // L'utilisateur est sur le site siège
+}
 ```
 
 ## Prochaines étapes

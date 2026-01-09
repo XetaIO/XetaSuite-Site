@@ -81,26 +81,6 @@ POST /api/v1/users/{id}/sites
   Each site can have a different role. The user switches sites via the SiteSwitcher.
 </Aside>
 
-## Modify permissions
-
-### Change role on a site
-
-```http
-PATCH /api/v1/users/{id}/sites/{site_id}
-```
-
-```json
-{
-    "role": "admin"
-}
-```
-
-### Remove access to a site
-
-```http
-DELETE /api/v1/users/{id}/sites/{site_id}
-```
-
 ## Disable a user
 
 Users are never deleted, only disabled:
@@ -111,7 +91,7 @@ PATCH /api/v1/users/{id}
 
 ```json
 {
-    "is_active": false
+    "deleted_at": "2026-01-03 21:43:49"
 }
 ```
 
@@ -124,3 +104,6 @@ PATCH /api/v1/users/{id}
 | Create | `user.create` |
 | Modify | `user.update` |
 | Delete | `user.delete` |
+| Restore | `user.restore` |
+| Assign Direct Permissions | `user.assignDirectPermission` |
+| Assign Sites | `user.assignSite` |

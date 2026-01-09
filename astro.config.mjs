@@ -62,7 +62,7 @@ export default defineConfig({
 						{ label: 'Créer une entreprise', translations: { en: 'Create a company' }, slug: 'guides/create-company' },
 						{ label: 'Créer une maintenance', translations: { en: 'Create a maintenance' }, slug: 'guides/create-maintenance' },
 						{ label: 'Gérer les incidents', translations: { en: 'Manage incidents' }, slug: 'guides/manage-incidents' },
-						{ label: 'Mouvements de pièces', translations: { en: 'Part movements' }, slug: 'guides/item-movements' },
+						{ label: 'Mouvements d\'articles', translations: { en: 'Items movements' }, slug: 'guides/item-movements' },
 					],
 				},
 				{

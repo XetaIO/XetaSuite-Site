@@ -8,9 +8,9 @@ import { Steps, Tabs, TabItem, Aside } from '@astrojs/starlight/components';
 ## Prérequis serveur
 
 ### Backend
-- PHP 8.2+ avec extensions : `pdo_pgsql`, `mbstring`, `xml`, `curl`, `zip`
+- PHP 8.4+ avec extensions : `pdo_pgsql`, `mbstring`, `xml`, `curl`, `zip`
 - Composer 2.x
-- PostgreSQL 16, 17 ou 18
+- PostgreSQL 18
 - Redis (recommandé pour cache/queues)
 - Nginx ou Apache
 
@@ -38,7 +38,7 @@ import { Steps, Tabs, TabItem, Aside } from '@astrojs/starlight/components';
    ```
 
    Éditez `.env` :
-   ```env
+   ```bash
    APP_ENV=production
    APP_DEBUG=false
    APP_URL=https://api.xetasuite.com
@@ -49,13 +49,13 @@ import { Steps, Tabs, TabItem, Aside } from '@astrojs/starlight/components';
    DB_USERNAME=your-user
    DB_PASSWORD=your-password
 
-   SANCTUM_STATEFUL_DOMAINS=app.xetasuite.com
+   SANCTUM_STATEFUL_DOMAINS=xetasuite.com
    SESSION_DOMAIN=.xetasuite.com
-   FRONTEND_URL=https://app.xetasuite.com
+   SPA_URL=https://xetasuite.com
 
    QUEUE_CONNECTION=redis
    CACHE_DRIVER=redis
-   SESSION_DRIVER=redis
+   SESSION_DRIVER=database
    ```
 
 3. **Optimiser pour la production**
@@ -121,24 +121,24 @@ server {
 
    ```bash
    cd XetaSuite-React
-   npm install
+   npm ci
    npm run build
    ```
 
 2. **Configurer l'environnement**
 
-   Créez `.env.production` :
-   ```env
+   Créez `.env` :
+   ```bash
    VITE_API_URL=https://api.xetasuite.com
    ```
 
-3. **Déployer le dossier `dist/`**
+3. **Déployer les fichiers statiques**
 
-   Uploadez le contenu de `dist/` sur votre hébergement.
+   Uploadez le contenu du dossier `dist/` sur votre serveur web ou CDN.
 
 </Steps>
 
-## Configuration Nginx (Frontend SPA)
+## Configuration Nginx (Frontend)
 
 ```nginx
 server {
@@ -151,12 +151,10 @@ server {
     ssl_certificate /path/to/certificate.crt;
     ssl_certificate_key /path/to/private.key;
 
-    # SPA: toutes les routes vers index.html
     location / {
         try_files $uri $uri/ /index.html;
     }
 
-    # Cache des assets
     location ~* \.(js|css|png|jpg|jpeg|gif|ico|svg|woff|woff2)$ {
         expires 1y;
         add_header Cache-Control "public, immutable";
@@ -164,32 +162,31 @@ server {
 }
 ```
 
-<Aside type="caution">
-  La directive `try_files $uri $uri/ /index.html;` est **critique** pour le routing SPA.
-</Aside>
+## Queue workers
 
-## Déploiement avec Laravel Forge
+Consultez le guide [Queue Workers](/deployment/queue-workers/) pour configurer Supervisor ou Systemd.
+
+## Certificats SSL
 
 <Tabs>
-  <TabItem label="Backend">
-    1. Créer un site `api.xetasuite.com`
-    2. Configurer le repository Git
-    3. Ajouter les variables d'environnement
-    4. Activer Queue Workers et Scheduler
+  <TabItem label="Let's Encrypt">
+    ```bash
+    sudo apt install certbot python3-certbot-nginx
+    sudo certbot --nginx -d api.xetasuite.com -d app.xetasuite.com
+    ```
   </TabItem>
-  <TabItem label="Frontend">
-    1. Créer un site statique `app.xetasuite.com`
-    2. Dans le deploy script, ajouter :
-       ```bash
-       npm install
-       npm run build
-       ```
-    3. Définir `dist` comme web directory
-    4. Configurer le fallback vers `index.html`
+  <TabItem label="Laravel Forge">
+    Forge gère automatiquement les certificats SSL avec Let's Encrypt.
   </TabItem>
 </Tabs>
 
-## Prochaines étapes
+## Checklist post-déploiement
 
-- [Queue Workers](/deployment/queue-workers/) - Configurer les workers
-- [Cron & Scheduler](/deployment/cron/) - Tâches planifiées
+- [ ] `APP_DEBUG=false`
+- [ ] `APP_ENV=production`
+- [ ] Caches générés (`config:cache`, `route:cache`, etc.)
+- [ ] Queue worker en cours d'exécution
+- [ ] Cron du scheduler configuré
+- [ ] Certificats SSL installés
+- [ ] Sauvegardes configurées
+- [ ] Monitoring en place

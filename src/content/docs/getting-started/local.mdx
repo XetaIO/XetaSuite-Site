@@ -30,7 +30,6 @@ Si vous utilisez [Laravel Herd](https://herd.laravel.com/), le backend est autom
    Cette commande lance :
    - Le serveur Laravel
    - Le worker de queue
-   - Vite pour les assets backend (si utilisés)
 
 2. **Démarrer le frontend**
 
@@ -75,8 +74,8 @@ Après avoir exécuté les seeders, vous pouvez vous connecter avec :
 | Email | Mot de passe | Rôle |
 |-------|--------------|------|
 | `admin@xetasuite.test` | `password` | Admin HQ |
-| `manager@site1.test` | `password` | Manager Site 1 |
-| `user@site1.test` | `password` | Utilisateur Site 1 |
+| `manager@xetasuite.test` | `password` | Manager Site 1 |
+| `user@xetasuite.test` | `password` | Utilisateur Site 1 |
 
 <Aside type="tip">
   En mode démo (`APP_DEMO=true`), les identifiants sont pré-remplis sur la page de connexion.
@@ -98,45 +97,49 @@ php artisan migrate:fresh --seed
 
 # Formater le code
 vendor/bin/pint --dirty
-
-# Voir les routes API
-php artisan route:list --path=api
 ```
 
 ### Frontend
 
 ```bash
+# Serveur de développement
+npm run dev
+
 # Build de production
 npm run build
 
-# Linter
+# Lancer le linter
 npm run lint
-
-# Preview du build
-npm run preview
 ```
 
 ## Résolution de problèmes
 
-### Erreur CORS
+### Erreurs CORS
 
-Vérifiez que `SANCTUM_STATEFUL_DOMAINS` et `FRONTEND_URL` sont correctement configurés dans `.env` du backend.
-
-### Erreur 401 Unauthorized
-
-1. Assurez-vous que le cookie CSRF est obtenu avant la connexion
-2. Vérifiez que `withCredentials: true` est configuré dans Axios
-
-### Erreur Vite Manifest
+Vérifiez que `SPA_URL` dans `.env` correspond à l'URL de votre frontend :
 
 ```bash
-cd XetaSuite-React
-npm run build
-# ou
-npm run dev
+SPA_URL=http://localhost:5173
 ```
 
-## Prochaines étapes
+### 419 CSRF token mismatch
 
-- [Authentification](/concepts/authentication/) - Comprendre le flow d'auth
-- [Multi-Sites](/concepts/multi-sites/) - Gestion multi-tenant
+Assurez-vous d'appeler `/sanctum/csrf-cookie` avant la connexion :
+
+```typescript
+await axios.get('/sanctum/csrf-cookie');
+await axios.post('/api/v1/auth/login', credentials);
+```
+
+### Session non persistante
+
+Vérifiez ces paramètres :
+
+```txt
+SANCTUM_STATEFUL_DOMAINS=localhost:5173,xetasuite.test
+SESSION_DOMAIN=localhost
+```
+
+<Aside type="note">
+  Pour le développement local avec différents ports, incluez tous les domaines dans `SANCTUM_STATEFUL_DOMAINS`.
+</Aside>

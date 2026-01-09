@@ -9,17 +9,17 @@ import { Aside, Tabs, TabItem } from '@astrojs/starlight/components';
 
 ### Application
 
-```env
+```bash
 APP_NAME=XetaSuite
-APP_ENV=local          # local, staging, production
-APP_KEY=               # Généré avec php artisan key:generate
-APP_DEBUG=true         # false en production
-APP_URL=https://xetasuite.test
+APP_ENV=local  # local, staging, production
+APP_KEY=       # Généré avec php artisan key:generate
+APP_DEBUG=true # false en production
+APP_URL=https://api.xetasuite.test # URL Backend
 ```
 
 ### Base de données
 
-```env
+```bash
 DB_CONNECTION=pgsql
 DB_HOST=127.0.0.1
 DB_PORT=5432
@@ -29,32 +29,36 @@ DB_PASSWORD=secret
 ```
 
 <Aside type="caution">
-  XetaSuite supporte **uniquement PostgreSQL** (versions 16, 17, 18). MySQL/MariaDB ne sont pas supportés.
+  XetaSuite supporte **uniquement PostgreSQL** (version 18+). MySQL/MariaDB ne sont pas supportés.
 </Aside>
 
 ### Authentification Sanctum
 
-```env
+```bash
 # Domaines autorisés pour l'authentification SPA
-SANCTUM_STATEFUL_DOMAINS=localhost:5173,xetasuite.test
+SANCTUM_STATEFUL_DOMAINS=xetasuite.test
 
 # Domaine du cookie de session
 SESSION_DOMAIN=.xetasuite.test
 
 # Driver de session
 SESSION_DRIVER=database
+
+# Cookies sécurisés
+SESSION_SAME_SITE=none
+SESSION_SECURE_COOKIE=true
 ```
 
 ### CORS
 
-```env
+```bash
 # URL du frontend (pour les headers CORS)
-FRONTEND_URL=http://localhost:5173
+SPA_URL=http://xetasuite.test
 ```
 
 ### Queue & Cache
 
-```env
+```bash
 QUEUE_CONNECTION=redis    # sync, database, redis
 CACHE_DRIVER=redis        # file, database, redis
 REDIS_HOST=127.0.0.1
@@ -64,7 +68,7 @@ REDIS_PORT=6379
 
 ### Mail
 
-```env
+```bash
 MAIL_MAILER=smtp
 MAIL_HOST=mailpit
 MAIL_PORT=1025
@@ -79,7 +83,7 @@ MAIL_FROM_NAME="${APP_NAME}"
 
 ### API
 
-```env
+```bash
 # Vide pour utiliser le proxy Vite (développement)
 VITE_API_URL=
 
@@ -91,29 +95,34 @@ VITE_API_URL=https://api.xetasuite.com
 
 <Tabs>
   <TabItem label="Backend">
-    ```env
+    ```bash
     APP_ENV=production
     APP_DEBUG=false
 
     # Domaines de production
-    SANCTUM_STATEFUL_DOMAINS=app.xetasuite.com
+    SANCTUM_STATEFUL_DOMAINS=xetasuite.com
     SESSION_DOMAIN=.xetasuite.com
-    FRONTEND_URL=https://app.xetasuite.com
+    FRONTEND_URL=https://xetasuite.com
 
-    # Redis pour les queues
+    # Drivers recommandés
     QUEUE_CONNECTION=redis
     CACHE_DRIVER=redis
-    SESSION_DRIVER=redis
+    SESSION_DRIVER=database
     ```
   </TabItem>
   <TabItem label="Frontend">
-    ```env
+    ```bash
     VITE_API_URL=https://api.xetasuite.com
     ```
   </TabItem>
 </Tabs>
 
-## Prochaines étapes
+## Notes importantes
 
-- [Lancer en local](/getting-started/local/) - Démarrer l'environnement de développement
-- [Déploiement Production](/deployment/production/) - Mettre en production
+<Aside type="tip">
+  Le `SESSION_DOMAIN` doit commencer par un point (`.xetasuite.com`) pour permettre le partage des cookies entre sous-domaines.
+</Aside>
+
+<Aside type="caution">
+  Ne jamais commiter votre fichier `.env` dans le contrôle de version. Utilisez `.env.example` comme modèle.
+</Aside>

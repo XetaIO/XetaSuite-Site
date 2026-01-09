@@ -104,35 +104,25 @@ POST /api/v1/auth/logout
 GET /api/v1/user
 ```
 
-**Réponse 200 :**
+**Réponse :**
 ```json
 {
     "data": {
         "id": 1,
-        "username": "jdupont",
         "first_name": "Jean",
         "last_name": "Dupont",
         "full_name": "Jean Dupont",
-        "email": "jean.dupont@example.com",
+        "email": "jean@example.com",
+        "username": "jdupont",
         "locale": "fr",
         "current_site_id": 1,
         "roles": ["admin"],
-        "permissions": [
-            "material.viewAny",
-            "material.view",
-            "material.create",
-            "..."
-        ],
+        "permissions": ["company.viewAny", "company.view", "..."],
         "sites": [
             {
                 "id": 1,
-                "name": "Siège Paris",
+                "name": "Siège",
                 "is_headquarters": true
-            },
-            {
-                "id": 2,
-                "name": "Usine Lyon",
-                "is_headquarters": false
             }
         ]
     }
@@ -154,18 +144,7 @@ PATCH /api/v1/user/site
 }
 ```
 
-**Réponse 200 :**
-```json
-{
-    "data": {
-        "id": 1,
-        "current_site_id": 2,
-        "roles": ["manager"],
-        "permissions": ["...nouveau set de permissions..."],
-        "..."
-    }
-}
-```
+**Réponse :** Utilisateur mis à jour avec les nouvelles permissions pour le site sélectionné.
 
 ---
 
@@ -182,57 +161,30 @@ PATCH /api/v1/user/locale
 }
 ```
 
----
+## Implémentation client React
 
-### Forgot Password
+```typescript
+// httpClient.ts
+const httpClient = axios.create({
+    baseURL: import.meta.env.VITE_API_URL || '',
+    headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+        'X-Requested-With': 'XMLHttpRequest',
+    },
+    withCredentials: true,   // Requis pour les cookies Sanctum
+    withXSRFToken: true,     // Inclut automatiquement le header XSRF-TOKEN
+});
 
-```http
-POST /api/v1/auth/forgot-password
+// AuthRepository.ts
+export const AuthRepository = {
+    login: async (credentials: LoginCredentials): Promise<void> => {
+        await httpClient.get('/sanctum/csrf-cookie');
+        await httpClient.post('/api/v1/auth/login', credentials);
+    },
+    logout: async (): Promise<void> => {
+        await httpClient.get('/sanctum/csrf-cookie');
+        await httpClient.post('/api/v1/auth/logout');
+    },
+};
 ```
-
-**Body :**
-```json
-{
-    "email": "user@example.com"
-}
-```
-
-**Réponse 200 :**
-```json
-{
-    "message": "We have emailed your password reset link!"
-}
-```
-
----
-
-### Reset Password
-
-```http
-POST /api/v1/auth/reset-password
-```
-
-**Body :**
-```json
-{
-    "token": "reset-token-from-email",
-    "email": "user@example.com",
-    "password": "NewSecurePass123!",
-    "password_confirmation": "NewSecurePass123!"
-}
-```
-
-## Codes d'erreur
-
-| Code | Description |
-|------|-------------|
-| 401 | Non authentifié |
-| 403 | Accès interdit (permission manquante) |
-| 419 | Session expirée (CSRF token invalide) |
-| 422 | Erreur de validation |
-| 429 | Trop de requêtes (rate limiting) |
-
-## Prochaines étapes
-
-- [Endpoints principaux](/api/endpoints/) - Référence API complète
-- [Authentification](/concepts/authentication/) - Comprendre le flow

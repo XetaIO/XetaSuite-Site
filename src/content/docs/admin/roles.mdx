@@ -13,8 +13,7 @@ Les rôles sont **scopés par site** grâce à Spatie Laravel-Permission avec le
 |------|-------------|
 | `admin` | Accès complet au site |
 | `manager` | Gestion des opérations |
-| `technician` | Interventions techniques |
-| `user` | Consultation uniquement |
+| `user` | Accès lecture seule |
 
 ## Créer un rôle
 
@@ -34,6 +33,8 @@ POST /api/v1/roles
 ```json
 {
     "name": "supervisor",
+    "level": 50,
+    "site_id": 1,
     "permissions": [
         "material.viewAny",
         "material.view",
@@ -48,7 +49,7 @@ POST /api/v1/roles
 ```
 
 <Aside type="caution">
-  Les rôles sont créés dans le contexte du site actuel. Changez de site pour créer un rôle sur un autre site.
+  Le site assigné au rôle ne peut pas être modifié après création.
 </Aside>
 
 ## Modifier un rôle
@@ -71,30 +72,7 @@ PATCH /api/v1/roles/{id}
 
 ## Permissions par module
 
-### Matériels
-- `material.viewAny`, `material.view`, `material.create`, `material.update`, `material.delete`
-
-### Zones
-- `zone.viewAny`, `zone.view`, `zone.create`, `zone.update`, `zone.delete`
-
-### Maintenances
-- `maintenance.viewAny`, `maintenance.view`, `maintenance.create`, `maintenance.update`, `maintenance.delete`
-
-### Incidents
-- `incident.viewAny`, `incident.view`, `incident.create`, `incident.update`, `incident.delete`
-
-### Nettoyages
-- `cleaning.viewAny`, `cleaning.view`, `cleaning.create`, `cleaning.update`, `cleaning.delete`
-
-### Inventaire
-- `item.viewAny`, `item.view`, `item.create`, `item.update`, `item.delete`
-- `item-movement.viewAny`, `item-movement.view`, `item-movement.create`, `item-movement.update`, `item-movement.delete`
-
-### Fournisseurs (HQ uniquement)
-- `company.viewAny`, `company.view`, `company.create`, `company.update`, `company.delete`
-
-### Utilisateurs
-- `user.viewAny`, `user.view`, `user.create`, `user.update`, `user.delete`
+Voir toutes les permissions sur la [page des permissions](/admin/permissions/).
 
 ## Supprimer un rôle
 
@@ -102,11 +80,6 @@ PATCH /api/v1/roles/{id}
 DELETE /api/v1/roles/{id}
 ```
 
-<Aside type="note">
-  Un rôle ne peut être supprimé que s'il n'est assigné à aucun utilisateur.
+<Aside type="caution">
+  Un rôle avec des utilisateurs assignés ne peut pas être supprimé. Réassignez d'abord les utilisateurs.
 </Aside>
-
-## Prochaines étapes
-
-- [Gestion des permissions](/admin/permissions/) - Permissions détaillées
-- [Gestion des utilisateurs](/admin/users/) - Assigner des rôles

@@ -110,12 +110,6 @@ GET /maintenances?material_id=5&status=scheduled&type=preventive
 | PATCH | `/incidents/{id}` | Modifier un incident |
 | DELETE | `/incidents/{id}` | Supprimer un incident |
 
-### Filtres
-
-```
-GET /incidents?material_id=5&status=open&priority=high
-```
-
 ## Nettoyages
 
 | Méthode | Endpoint | Description |
@@ -141,28 +135,22 @@ GET /incidents?material_id=5&status=open&priority=high
 | Méthode | Endpoint | Description |
 |---------|----------|-------------|
 | GET | `/item-movements` | Liste des mouvements |
-| GET | `/items/{id}/movements` | Mouvements d'une pièce |
+| GET | `/item-movements/{id}` | Détail d'un mouvement |
 | POST | `/item-movements` | Créer un mouvement |
 
-## Fournisseurs (HQ uniquement)
-
-<Aside type="caution">
-  Ces endpoints ne sont accessibles que depuis le Site Siège.
-</Aside>
+## Entreprises (HQ uniquement)
 
 | Méthode | Endpoint | Description |
 |---------|----------|-------------|
-| GET | `/companies` | Liste des fournisseurs |
-| GET | `/companies/{id}` | Détail d'un fournisseur |
-| POST | `/companies` | Créer un fournisseur |
-| PATCH | `/companies/{id}` | Modifier un fournisseur |
-| DELETE | `/companies/{id}` | Supprimer un fournisseur |
+| GET | `/companies` | Liste des entreprises |
+| GET | `/companies/{id}` | Détail d'une entreprise |
+| POST | `/companies` | Créer une entreprise |
+| PATCH | `/companies/{id}` | Modifier une entreprise |
+| DELETE | `/companies/{id}` | Supprimer une entreprise |
 
-### Filtres
-
-```
-GET /companies?types[]=ITEM_PROVIDER&search=acme
-```
+<Aside type="note">
+  Les actions `Create`, `Update` & `Delete` pour les entreprises ne sont accessibles que depuis le Site Siège.
+</Aside>
 
 ## Utilisateurs
 
@@ -178,26 +166,11 @@ GET /companies?types[]=ITEM_PROVIDER&search=acme
 
 | Méthode | Endpoint | Description |
 |---------|----------|-------------|
-| GET | `/roles` | Liste des rôles (site actuel) |
+| GET | `/roles` | Liste des rôles |
+| GET | `/roles/{id}` | Détail d'un rôle |
 | POST | `/roles` | Créer un rôle |
 | PATCH | `/roles/{id}` | Modifier un rôle |
 | DELETE | `/roles/{id}` | Supprimer un rôle |
-
-## Permissions
-
-| Méthode | Endpoint | Description |
-|---------|----------|-------------|
-| GET | `/permissions` | Liste des permissions |
-
-## Paramètres de requête communs
-
-| Paramètre | Description | Exemple |
-|-----------|-------------|---------|
-| `page` | Numéro de page | `?page=2` |
-| `per_page` | Résultats par page | `?per_page=25` |
-| `sort` | Tri | `?sort=name` ou `?sort=-created_at` |
-| `search` | Recherche textuelle | `?search=motclé` |
-| `include` | Relations à inclure | `?include=zone,company` |
 
 ## Prochaines étapes
 

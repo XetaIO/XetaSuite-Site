@@ -52,6 +52,8 @@ import { Aside } from '@astrojs/starlight/components';
 | `material.create` | Créer un matériel |
 | `material.update` | Modifier un matériel |
 | `material.delete` | Supprimer un matériel |
+| `material.generateQrCode` | Générer le QRCode du matériel |
+| `material.scanQrCode` | Scanner le QRCode du matériel |
 
 ### Gestion des maintenances
 
@@ -83,7 +85,7 @@ import { Aside } from '@astrojs/starlight/components';
 | `cleaning.update` | Modifier un nettoyage |
 | `cleaning.delete` | Supprimer un nettoyage |
 
-### Gestion de l'inventaire
+### Gestion des pièces
 
 | Permission | Description |
 |------------|-------------|
@@ -92,24 +94,33 @@ import { Aside } from '@astrojs/starlight/components';
 | `item.create` | Créer une pièce |
 | `item.update` | Modifier une pièce |
 | `item.delete` | Supprimer une pièce |
+| `item.generateQrCode` | Générer le QRCode de la pièce |
+| `item.scanQrCode` | Scanner le QRCode de la pièce |
+
+### Gestion des mouvements
+
+| Permission | Description |
+|------------|-------------|
 | `item-movement.viewAny` | Voir les mouvements |
 | `item-movement.create` | Créer un mouvement |
+| `item-movement.update` | Modifier un mouvement |
+| `item-movement.delete` | Supprimer un mouvement |
 
-### Gestion des fournisseurs (HQ)
+### Gestion des entreprises (HQ)
 
 <Aside type="note">
-  Ces permissions ne sont effectives que sur le Site Siège.
+  Les permissions `Create`, `Update` & `Delete` ne sont disponibles que sur le Site Siège.
 </Aside>
 
 | Permission | Description |
 |------------|-------------|
-| `company.viewAny` | Voir la liste des fournisseurs |
-| `company.view` | Voir un fournisseur |
-| `company.create` | Créer un fournisseur |
-| `company.update` | Modifier un fournisseur |
-| `company.delete` | Supprimer un fournisseur |
+| `company.viewAny` | Voir la liste des entreprises |
+| `company.view` | Voir une entreprise |
+| `company.create` | Créer une entreprise |
+| `company.update` | Modifier une entreprise |
+| `company.delete` | Supprimer une entreprise |
 
-### Administration
+### Gestion des utilisateurs
 
 | Permission | Description |
 |------------|-------------|
@@ -118,41 +129,33 @@ import { Aside } from '@astrojs/starlight/components';
 | `user.create` | Créer un utilisateur |
 | `user.update` | Modifier un utilisateur |
 | `user.delete` | Supprimer un utilisateur |
-| `role.viewAny` | Voir les rôles |
-| `role.create` | Créer un rôle |
-| `role.update` | Modifier un rôle |
-| `role.delete` | Supprimer un rôle |
+| `user.restore` | Restaurer un utilisateur |
+| `user.assignDirectPermission` | Assigner des permissions directes |
+| `user.assignSite` | Assigner des sites |
 
-## Vérification côté client
+
+## Vérifier les permissions dans React
 
 ```tsx
-const { hasPermission, hasAnyPermission } = useAuth();
+import { useAuth } from '@/features/Auth/hooks';
 
-// Permission unique
-if (hasPermission('material.create')) {
-    // Afficher bouton création
-}
+function MyComponent() {
+    const { hasPermission, hasAnyPermission, hasRole, hasAnyRole } = useAuth();
 
-// Une des permissions (OR)
-if (hasAnyPermission(['material.update', 'material.delete'])) {
-    // Afficher menu actions
+    return (
+        <div>
+            {hasPermission('company.create') && (
+                <button>Créer une entreprise</button>
+            )}
+
+            {hasAnyPermission(['company.update', 'company.delete']) && (
+                <EditMenu />
+            )}
+
+            {hasRole('admin') && <AdminPanel />}
+
+            {hasAnyRole(['admin', 'manager']) && <AdminPanel />}
+        </div>
+    );
 }
 ```
-
-## Vérification côté serveur
-
-```php
-// Dans un Controller
-$this->authorize('create', Material::class);
-
-// Via Gate
-Gate::authorize('update', $material);
-
-// Directement sur l'utilisateur
-$user->can('material.delete');
-```
-
-## Prochaines étapes
-
-- [Gestion des rôles](/admin/roles/) - Assigner des permissions aux rôles
-- [Multi-Sites](/concepts/multi-sites/) - Permissions par site

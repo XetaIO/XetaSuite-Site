@@ -1,6 +1,6 @@
 ---
 title: Gérer les incidents
-description: Guide pour signaler et gérer les incidents sur les matériels.
+description: Guide pour signaler et gérer les incidents sur les équipements.
 ---
 
 import { Steps, Aside } from '@astrojs/starlight/components';
@@ -38,10 +38,10 @@ Les incidents permettent de signaler et suivre les problèmes sur les équipemen
 3. **Remplir le formulaire**
 
    | Champ | Obligatoire | Description |
-   |-------|-------------|-------------|
-   | Matériel | ✅ | Équipement concerné |
+   |-------|----------|-------------|
+   | Équipement | ✅ | Équipement concerné |
    | Titre | ✅ | Description courte |
-   | Priorité | ✅ | Low, Medium, High, Critical |
+   | Priorité | ✅ | Basse, Moyenne, Haute, Critique |
    | Description | ✅ | Détails du problème |
 
 4. **Enregistrer**
@@ -99,13 +99,14 @@ POST /api/v1/incidents
             "id": 5,
             "full_name": "Jean Dupont"
         },
-        "reported_at": "2024-01-15T14:30:00Z",
-        "resolved_at": null
+        "created_at": "2024-01-15T08:30:00Z"
     }
 }
 ```
 
-## Prendre en charge un incident
+## Mettre à jour le statut de l'incident
+
+### Prendre en charge
 
 ```http
 PATCH /api/v1/incidents/{id}
@@ -114,38 +115,44 @@ PATCH /api/v1/incidents/{id}
 ```json
 {
     "status": "IN_PROGRESS",
-    "assigned_to": 10
+    "assigned_to": 3
 }
 ```
 
-## Résoudre un incident
+### Résoudre
 
 ```json
 {
     "status": "RESOLVED",
-    "resolution": "Remplacement du roulement défectueux. Compresseur opérationnel.",
-    "resolved_at": "2024-01-15T17:00:00Z"
+    "resolution": "Remplacement du roulement usé. Bruit éliminé."
 }
 ```
 
-## Convertir en maintenance
+### Fermer
 
-Un incident peut générer une maintenance corrective :
+```json
+{
+    "status": "CLOSED"
+}
+```
+
+## Lier à une maintenance
+
+Un incident peut déclencher une maintenance :
 
 ```http
-POST /api/v1/incidents/{id}/create-maintenance
+POST /api/v1/maintenances
 ```
 
 ```json
 {
-    "scheduled_at": "2024-01-16T09:00:00Z",
-    "company_id": 5
+    "material_id": 1,
+    "type": "CORRECTIVE",
+    "incident_id": 1,
+    "scheduled_at": "2024-01-15T14:00:00Z",
+    "description": "Réparation suite à l'incident #1"
 }
 ```
-
-<Aside type="tip">
-  La conversion en maintenance lie automatiquement l'incident à la maintenance créée.
-</Aside>
 
 ## Permissions requises
 
@@ -157,7 +164,8 @@ POST /api/v1/incidents/{id}/create-maintenance
 | Modifier | `incident.update` |
 | Supprimer | `incident.delete` |
 
-## Prochaines étapes
+## Filtres
 
-- [Créer une maintenance](/guides/create-maintenance/) - Planifier une intervention
-- [Mouvements de pièces](/guides/item-movements/) - Gérer le stock
+```http
+GET /api/v1/incidents?status=OPEN&priority=HIGH&material_id=1
+```

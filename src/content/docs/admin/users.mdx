@@ -18,7 +18,7 @@ import { Steps, Aside } from '@astrojs/starlight/components';
 3. **Remplir les informations**
 
    | Champ | Obligatoire | Description |
-   |-------|-------------|-------------|
+   |-------|----------|-------------|
    | Prénom | ✅ | Prénom de l'utilisateur |
    | Nom | ✅ | Nom de famille |
    | Email | ✅ | Email unique (login) |
@@ -81,27 +81,9 @@ POST /api/v1/users/{id}/sites
   Chaque site peut avoir un rôle différent. L'utilisateur change de site via le SiteSwitcher.
 </Aside>
 
-## Modifier les permissions
-
-### Changer le rôle sur un site
-
-```http
-PATCH /api/v1/users/{id}/sites/{site_id}
-```
-
-```json
-{
-    "role": "admin"
-}
-```
-
-### Retirer l'accès à un site
-
-```http
-DELETE /api/v1/users/{id}/sites/{site_id}
-```
-
 ## Désactiver un utilisateur
+
+Les utilisateurs ne sont jamais supprimés, seulement désactivés :
 
 ```http
 PATCH /api/v1/users/{id}
@@ -109,13 +91,9 @@ PATCH /api/v1/users/{id}
 
 ```json
 {
-    "is_active": false
+    "deleted_at": "2026-01-03 21:43:49"
 }
 ```
-
-<Aside type="caution">
-  Un utilisateur désactivé ne peut plus se connecter mais ses données sont conservées.
-</Aside>
 
 ## Permissions requises
 
@@ -126,8 +104,6 @@ PATCH /api/v1/users/{id}
 | Créer | `user.create` |
 | Modifier | `user.update` |
 | Supprimer | `user.delete` |
-
-## Prochaines étapes
-
-- [Gestion des rôles](/admin/roles/) - Créer et configurer les rôles
-- [Gestion des permissions](/admin/permissions/) - Permissions granulaires
+| Restaurer | `user.restore` |
+| Assigner permissions directes | `user.assignDirectPermission` |
+| Assigner sites | `user.assignSite` |

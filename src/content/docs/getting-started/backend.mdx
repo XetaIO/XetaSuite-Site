@@ -9,10 +9,9 @@ Ce guide vous accompagne dans l'installation du backend Laravel de XetaSuite.
 
 ## Prérequis
 
-- **PHP** 8.2+ (8.3 ou 8.4 recommandé)
+- **PHP** 8.4+
 - **Composer** 2.x
-- **PostgreSQL** 16, 17 ou 18
-- **Node.js** 20+ (pour les assets)
+- **PostgreSQL** 18
 - **Redis** (optionnel, pour les queues)
 
 ## Installation
@@ -41,9 +40,7 @@ Ce guide vous accompagne dans l'installation du backend Laravel de XetaSuite.
 
 4. **Configurer la base de données**
 
-   Éditez le fichier `.env` :
-
-   ```env
+   ```bash
    DB_CONNECTION=pgsql
    DB_HOST=127.0.0.1
    DB_PORT=5432
@@ -74,27 +71,12 @@ Ce guide vous accompagne dans l'installation du backend Laravel de XetaSuite.
 
 Configurez les domaines autorisés dans `.env` :
 
-```env
-SANCTUM_STATEFUL_DOMAINS=localhost:5173,xetasuite.test
+```bash
+SANCTUM_STATEFUL_DOMAINS=xetasuite.test
 SESSION_DOMAIN=.xetasuite.test
-```
-
-## Structure du projet
-
-```
-app/
-├── Actions/          # Classes d'action single-purpose
-├── Http/
-│   ├── Controllers/Api/V1/   # Contrôleurs API
-│   ├── Requests/V1/          # Form Requests
-│   └── Resources/V1/         # API Resources
-├── Models/           # Modèles Eloquent
-├── Observers/        # Observers pour les événements modèle
-├── Policies/         # Policies d'autorisation
-└── Services/         # Services métier
 ```
 
 ## Prochaines étapes
 
 - [Installation Frontend](/getting-started/frontend/) - Configurez l'application React
-- [Configuration .env](/getting-started/configuration/) - Options de configuration avancées
+- [Configuration](/getting-started/configuration/) - Options de configuration avancées

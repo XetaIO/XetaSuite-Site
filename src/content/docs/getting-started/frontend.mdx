@@ -47,7 +47,7 @@ Ce guide vous accompagne dans l'installation du frontend React de XetaSuite.
 
    Éditez `.env` si nécessaire :
 
-   ```env
+   ```bash
    # Vide pour utiliser le proxy Vite (développement)
    VITE_API_URL=
 
@@ -74,63 +74,7 @@ Ce guide vous accompagne dans l'installation du frontend React de XetaSuite.
 
 </Steps>
 
-## Configuration du Proxy Vite
-
-Le proxy Vite redirige les requêtes `/api` et `/sanctum` vers le backend Laravel :
-
-```typescript
-// vite.config.ts
-server: {
-  proxy: {
-    '/sanctum': {
-      target: 'https://xetasuite.test',
-      changeOrigin: true,
-      secure: false,
-    },
-    '/api': {
-      target: 'https://xetasuite.test',
-      changeOrigin: true,
-      secure: false,
-    }
-  },
-}
-```
-
-<Aside type="caution">
-  Assurez-vous que le backend est accessible sur le domaine configuré dans le proxy.
-</Aside>
-
-## Stack Technique
-
-| Package | Version | Usage |
-|---------|---------|-------|
-| React | 19.x | Bibliothèque UI |
-| TypeScript | 5.9+ | Typage statique |
-| Vite | 7.x | Build tool |
-| Tailwind CSS | 4.x | Styling |
-| React Router | 7.x | Routing |
-| Axios | 1.x | HTTP Client |
-| i18next | 25.x | Internationalisation |
-
-## Structure du projet
-
-```
-src/
-├── app/              # Point d'entrée application
-│   ├── routes/       # Configuration des routes
-│   └── i18n/         # Traductions
-├── features/         # Modules fonctionnels
-│   ├── Auth/         # Authentification
-│   ├── Sites/        # Gestion des sites
-│   ├── Materials/    # Gestion du matériel
-│   └── ...
-└── shared/           # Code partagé
-    ├── api/          # Client HTTP
-    ├── components/   # Composants UI
-    └── types/        # Types TypeScript
-```
-
 ## Prochaines étapes
 
-- [Configuration .env](/getting-started/configuration/) - Variables d'environnement
+- [Configuration](/getting-started/configuration/) - Variables d'environnement
 - [Authentification](/concepts/authentication/) - Comprendre le flow Sanctum

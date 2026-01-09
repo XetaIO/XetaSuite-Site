@@ -5,7 +5,7 @@ description: Guide pour planifier et gérer les maintenances dans XetaSuite.
 
 import { Steps, Aside } from '@astrojs/starlight/components';
 
-Les maintenances permettent de suivre les interventions planifiées ou réalisées sur les matériels.
+Les maintenances permettent de suivre les interventions planifiées ou réalisées sur les équipements.
 
 ## Types de maintenance
 
@@ -13,7 +13,9 @@ Les maintenances permettent de suivre les interventions planifiées ou réalisé
 |------|-------------|
 | `PREVENTIVE` | Maintenance planifiée régulière |
 | `CORRECTIVE` | Réparation suite à une panne |
-| `PREDICTIVE` | Basée sur l'analyse de données |
+| `INSPECTION` | Inspection et vérification de routine |
+| `IMPROVEMENT` | Amélioration ou mise à niveau de l'équipement |
+| `PREDICTIVE` | Basée sur l'analyse de données (Pas encore implémenté) |
 
 ## Statuts de maintenance
 
@@ -23,6 +25,14 @@ Les maintenances permettent de suivre les interventions planifiées ou réalisé
 | `IN_PROGRESS` | En cours d'exécution |
 | `COMPLETED` | Terminée avec succès |
 | `CANCELLED` | Annulée |
+
+## Réalisation de la maintenance
+
+| Statut | Description |
+|--------|-------------|
+| `INTERNAL` | Réalisée par l'équipe interne |
+| `EXTERNAL` | Réalisée par un prestataire externe |
+| `BOTH` | Réalisée par l'interne et l'externe |
 
 ## Créer une maintenance
 
@@ -34,19 +44,25 @@ Les maintenances permettent de suivre les interventions planifiées ou réalisé
 
 2. **Cliquer sur "Nouvelle maintenance"**
 
-3. **Sélectionner le matériel**
+3. **Sélectionner l'équipement**
 
-   Choisissez le matériel concerné dans la liste.
+   Choisissez l'équipement concerné dans la liste.
 
 4. **Remplir les informations**
 
-   | Champ | Obligatoire | Description |
-   |-------|-------------|-------------|
-   | Matériel | ✅ | Équipement à maintenir |
-   | Type | ✅ | Préventive, Corrective, Prédictive |
-   | Date planifiée | ✅ | Date prévue de l'intervention |
-   | Description | ❌ | Détails de l'intervention |
-   | Prestataire | ❌ | Company de type maintenancier |
+    | Champ | Obligatoire | Description |
+    |-------|----------|-------------|
+    | Type | ✅ | Préventive, Corrective, Inspection, Amélioration |
+    | Réalisation | ✅ | Interne, Externe ou Les deux |
+    | Statut | ❌ | Planifiée, En cours, Terminée, Annulée |
+    | Matériel | ❌ | Équipement à maintenir |
+    | Date de début | ❌ | Date prévue de l'intervention |
+    | Opérateurs | ✅ | Utilisateurs assignés à la maintenance |
+    | Entreprises | ✅ | Entreprises prestataires de maintenance |
+    | Incidents | ❌ | Incidents liés à associer |
+    | Pièces détachées | ❌ | Pièces utilisées pendant la maintenance |
+    | Description | ✅ | Détails de l'intervention |
+    | Raison | ✅ | Raison de la maintenance |
 
 5. **Enregistrer**
 
@@ -95,12 +111,14 @@ POST /api/v1/maintenances
         "type": "PREVENTIVE",
         "status": "SCHEDULED",
         "scheduled_at": "2024-02-15T09:00:00Z",
-        "started_at": null,
-        "completed_at": null,
         "description": "Révision annuelle du compresseur",
         "company": {
             "id": 5,
-            "name": "MaintenancePro"
+            "name": "Tech Services Inc"
+        },
+        "created_by": {
+            "id": 1,
+            "full_name": "Jean Dupont"
         }
     }
 }
@@ -108,7 +126,7 @@ POST /api/v1/maintenances
 
 ## Mettre à jour le statut
 
-### Démarrer une maintenance
+### Démarrer l'intervention
 
 ```http
 PATCH /api/v1/maintenances/{id}
@@ -121,13 +139,13 @@ PATCH /api/v1/maintenances/{id}
 }
 ```
 
-### Terminer une maintenance
+### Terminer l'intervention
 
 ```json
 {
     "status": "COMPLETED",
-    "completed_at": "2024-02-15T12:00:00Z",
-    "notes": "Remplacement du filtre effectué"
+    "completed_at": "2024-02-15T14:00:00Z",
+    "notes": "Remplacement du filtre à air et vérification du niveau d'huile."
 }
 ```
 
@@ -140,12 +158,3 @@ PATCH /api/v1/maintenances/{id}
 | Créer | `maintenance.create` |
 | Modifier | `maintenance.update` |
 | Supprimer | `maintenance.delete` |
-
-<Aside type="tip">
-  Les maintenances sont liées au site du matériel. Un utilisateur ne voit que les maintenances de son site actuel.
-</Aside>
-
-## Prochaines étapes
-
-- [Gérer les incidents](/guides/manage-incidents/) - Signaler et suivre les incidents
-- [Mouvements de pièces](/guides/item-movements/) - Gérer le stock

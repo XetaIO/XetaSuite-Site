@@ -11,7 +11,7 @@ XetaSuite utilise les queues Laravel pour les tâches asynchrones : envoi d'emai
 
 ### Driver recommandé : Redis
 
-```env
+```bash
 QUEUE_CONNECTION=redis
 REDIS_HOST=127.0.0.1
 REDIS_PORT=6379
@@ -19,7 +19,7 @@ REDIS_PORT=6379
 
 ### Alternative : Database
 
-```env
+```bash
 QUEUE_CONNECTION=database
 ```
 
@@ -104,28 +104,13 @@ Utilisez un process manager pour maintenir les workers actifs.
   </TabItem>
 </Tabs>
 
-## Options importantes
+## Commandes utiles
 
-| Option | Description |
-|--------|-------------|
-| `--sleep=3` | Secondes d'attente si queue vide |
-| `--tries=3` | Nombre de tentatives avant échec |
-| `--max-time=3600` | Redémarrage après 1h (évite memory leaks) |
-| `--timeout=60` | Timeout par job |
-
-## Redémarrer après déploiement
-
-<Aside type="caution">
-  Après chaque déploiement, redémarrez les workers pour charger le nouveau code.
-</Aside>
+### Surveiller les workers
 
 ```bash
-php artisan queue:restart
+php artisan queue:monitor redis:default
 ```
-
-Ajoutez cette commande dans votre script de déploiement.
-
-## Monitoring
 
 ### Voir les jobs en échec
 
@@ -133,16 +118,14 @@ Ajoutez cette commande dans votre script de déploiement.
 php artisan queue:failed
 ```
 
-### Retenter un job
+### Retenter les jobs en échec
 
 ```bash
-php artisan queue:retry {id}
-```
-
-### Retenter tous les jobs
-
-```bash
+# Retenter tous
 php artisan queue:retry all
+
+# Retenter un spécifique
+php artisan queue:retry 5
 ```
 
 ### Purger les jobs en échec
@@ -151,7 +134,31 @@ php artisan queue:retry all
 php artisan queue:flush
 ```
 
-## Prochaines étapes
+## Redémarrer après déploiement
 
-- [Cron & Scheduler](/deployment/cron/) - Tâches planifiées
-- [Déploiement Production](/deployment/production/) - Guide complet
+<Aside type="caution">
+  Les workers doivent être redémarrés après le déploiement pour charger les nouvelles modifications.
+</Aside>
+
+```bash
+php artisan queue:restart
+```
+
+Cette commande signale aux workers de redémarrer gracieusement après avoir terminé leur job en cours.
+
+## Horizon (Optionnel)
+
+Pour une gestion plus avancée des queues, envisagez d'utiliser [Laravel Horizon](https://laravel.com/docs/horizon) :
+
+```bash
+composer require laravel/horizon
+php artisan horizon:install
+php artisan migrate
+```
+
+Lancer Horizon :
+```bash
+php artisan horizon
+```
+
+Accédez au dashboard à `/horizon`.
