@@ -1,0 +1,84 @@
+---
+title: Demo Mode
+description: Configuration and operation of XetaSuite demo mode.
+---
+
+import { Aside, Steps } from '@astrojs/starlight/components';
+
+XetaSuite comes with **demo mode disabled by default**.
+
+## What is demo mode for?
+
+This mode is designed to:
+
+- Allow a **public demonstration**
+- Prevent **data accumulation**
+- Ensure an **always functional environment**
+
+## Automatic database reset
+
+In demo mode, the database is automatically reset **every 6 hours** via the command:
+
+```bash
+php artisan demo:reset
+```
+
+This command:
+
+1. Deletes all data
+2. Runs migrations
+3. Re-seeds demonstration data
+
+<Aside type="caution">
+  All entered data is **temporary** and will be deleted on the next reset.
+</Aside>
+
+## Disabling demo mode
+
+<Aside type="danger">
+  If you want to use XetaSuite in a real environment (staging / production), you **must** disable demo mode.
+</Aside>
+
+<Steps>
+
+1. **Disable demo mode**
+
+   In your `.env` file:
+
+   ```bash
+   DEMO_MODE=false
+   ```
+
+2. **Remove the reset command**
+
+   Delete the following file:
+
+   ```
+   app/Console/Commands/ResetDemoDatabase.php
+   ```
+
+3. **Remove the scheduled task**
+
+   In `routes/console.php`, remove any reference to:
+
+   ```php
+   Schedule::command('demo:reset')->...
+   ```
+
+4. **Configure your backups**
+
+   Set up your own backup strategies (backups, monitoring, etc.).
+
+</Steps>
+
+## Why this mode exists
+
+Demo mode allows:
+
+- **Preventing abuse** on the public instance
+- **Keeping a clean environment** for demonstrations
+- **Freely testing** features without consequences
+
+<Aside type="note">
+  Demo mode is **not intended** for real production use.
+</Aside>

@@ -1,0 +1,84 @@
+---
+title: Mode Démo
+description: Configuration et fonctionnement du mode démo de XetaSuite.
+---
+
+import { Aside, Steps } from '@astrojs/starlight/components';
+
+XetaSuite est fourni avec un **mode démo désactivé par défaut**.
+
+## À quoi sert le mode démo ?
+
+Ce mode est conçu pour :
+
+- Permettre une **démonstration publique**
+- Éviter toute **accumulation de données**
+- Garantir un **environnement toujours fonctionnel**
+
+## Reset automatique de la base de données
+
+En mode démo, la base de données est automatiquement réinitialisée **toutes les 6 heures** via la commande :
+
+```bash
+php artisan demo:reset
+```
+
+Cette commande :
+
+1. Supprime toutes les données
+2. Relance les migrations
+3. Réinjecte les seeders de démonstration
+
+<Aside type="caution">
+  Toutes les données saisies sont **temporaires** et seront supprimées lors du prochain reset.
+</Aside>
+
+## Désactiver le mode démo
+
+<Aside type="danger">
+  Si vous souhaitez utiliser XetaSuite dans un environnement réel (staging / production), vous **devez impérativement** désactiver le mode démo.
+</Aside>
+
+<Steps>
+
+1. **Désactiver le mode démo**
+
+   Dans votre fichier `.env` :
+
+   ```bash
+   DEMO_MODE=false
+   ```
+
+2. **Supprimer la commande de reset**
+
+   Supprimez le fichier suivant :
+
+   ```
+   app/Console/Commands/ResetDemoDatabase.php
+   ```
+
+3. **Supprimer la tâche planifiée**
+
+   Dans `routes/console.php`, retirez toute référence à :
+
+   ```php
+   Schedule::command('demo:reset')->...
+   ```
+
+4. **Configurer vos sauvegardes**
+
+   Mettez en place vos propres stratégies de sauvegarde (backups, supervision, etc.).
+
+</Steps>
+
+## Pourquoi ce mode existe
+
+Le mode démo permet :
+
+- D'**éviter les abus** sur l'instance publique
+- De **garder un environnement propre** pour les démonstrations
+- De **tester librement** les fonctionnalités sans conséquences
+
+<Aside type="note">
+  Le mode démo n'est **pas destiné** à un usage en production réelle.
+</Aside>

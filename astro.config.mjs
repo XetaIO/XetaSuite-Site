@@ -44,6 +44,7 @@ export default defineConfig({
 						{ label: 'Installation (frontend)', translations: { en: 'Installation (frontend)' }, slug: 'getting-started/frontend' },
 						{ label: 'Configuration .env', translations: { en: 'Configuration .env' }, slug: 'getting-started/configuration' },
 						{ label: 'Lancer en local', translations: { en: 'Run locally' }, slug: 'getting-started/local' },
+						{ label: 'Mode Démo', translations: { en: 'Demo Mode' }, slug: 'getting-started/demo-mode' },
 					],
 				},
 				{
