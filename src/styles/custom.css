@@ -30,8 +30,12 @@
 	--sl-color-accent-high: #3449e3;
 
 	/* Custom variables for dark */
-	--card-bg: #1e293b;
-	--card-border: #475569;
+	--sl-color-bg: #0a0a0a;
+	--sl-color-bg-nav: #0a0a0a;
+	--sl-color-bg-sidebar: #0a0a0a;
+	--sl-color-hairline-light: #171717;
+	--card-bg: #171717;
+	--card-border: #262626;
 	--hero-bg: linear-gradient(180deg, #0f172a 0%, #1e293b 100%);
 	--section-bg: #0f172a;
 	--text-primary: #f8fafc;
